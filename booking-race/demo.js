@@ -2,8 +2,11 @@
 // "naive" is the check-then-insert service exactly as in naive-booking-service.js.
 // "fixed" is one way to fix it on the stand-in: a per-room lock around check+insert, half-open ranges, 404 on a missing row.
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const jitter = () => sleep(Math.random() * 4);
+// Random query latency as 0-7 macrotask yields. MessageChannel is not throttled in background tabs, setTimeout is.
+const chan = new MessageChannel(), waiting = [];
+chan.port1.onmessage = () => waiting.shift()();
+const yieldTask = () => new Promise((r) => { waiting.push(r); chan.port2.postMessage(0); });
+const jitter = async () => { for (let n = Math.random() * 8 | 0; n > 0; n--) await yieldTask(); };
 
 class HttpError extends Error { constructor(status, m) { super(m); this.status = status; } }
 
@@ -69,6 +72,7 @@ async function runDemo(log, variant) {
     if (r.filter((x) => x.status === 'fulfilled').length === 2) races++;
     line.className = races ? 'fail' : 'ok';
     line.textContent = `  double-booked: ${races} of ${i} runs\n`;
+    if (!document.hidden) await new Promise((r) => setTimeout(r, 15)); // pace the counter so it can be watched
   }
   report(races === 0, 'two near-simultaneous requests for the same room and slot: exactly one wins');
 
