@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Meeting-room booking: the double-booking race, live</title>
+<style>
+  :root{--bg:#0f172a;--panel:#111c33;--line:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--ok:#4ade80;--fail:#f87171;--cmd:#93c5fd;--accent:#38bdf8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,Helvetica,Arial,sans-serif}
+  main{max-width:860px;margin:0 auto;padding:28px 16px 40px}
+  h1{font-size:22px;line-height:1.3;margin:0 0 8px;color:#f8fafc}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+  .tag{display:inline-block;font:600 11px/1 Menlo,monospace;letter-spacing:.04em;text-transform:uppercase;padding:5px 8px;border-radius:4px;background:#1e293b;color:var(--muted);margin-bottom:12px}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}
+  button{font:600 15px -apple-system,Helvetica,sans-serif;border:0;border-radius:8px;padding:12px 22px;cursor:pointer;background:var(--accent);color:#04111f}
+  button:disabled{opacity:.5;cursor:wait}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{background:transparent;color:var(--muted);border-radius:0;padding:10px 14px;font-weight:500}
+  .seg button[aria-pressed=true]{background:#1e293b;color:var(--text)}
+  .term{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .term .top{padding:8px 14px;border-bottom:1px solid var(--line);font:12px Menlo,monospace;color:var(--muted)}
+  pre{margin:0;padding:14px;min-height:220px;max-height:60vh;overflow:auto;white-space:pre-wrap;word-break:break-word;font:13.5px/1.6 Menlo,Consolas,monospace}
+  .ok{color:var(--ok)}.fail{color:var(--fail)}.cmd{color:var(--cmd)}.dim{color:var(--muted)}
+  .headline{margin:16px 0 0;padding:14px 16px;border-radius:10px;border:1px solid var(--line);font-size:17px;font-weight:600;display:none}
+  .headline.fail{display:block;border-color:#7f1d1d;background:#2a1215}
+  .headline.ok{display:block;border-color:#14532d;background:#0f2417}
+  details{margin-top:20px;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--panel)}
+  summary{cursor:pointer;font-weight:600}
+  details p,details li{color:#cbd5e1;font-size:14px}
+  footer{margin-top:28px;color:var(--muted);font-size:13px}
+  footer a{color:var(--cmd)}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">runs in your browser · stand-in service, not your code</span>
+  <h1>Meeting-room booking: the double-booking race, live</h1>
+  <p class="sub">A booking API written the way it is usually written first: check for an overlap, then insert. Every manual test passes. Press Run and two people book the same room at the same moment, 100 times.</p>
+
+  <div class="bar">
+    <button id="run">Run it</button>
+    <div class="seg" role="group" aria-label="Version">
+      <button data-variant="naive" aria-pressed="true">As usually written</button>
+      <button data-variant="fixed" aria-pressed="false">With the fix</button>
+    </div>
+  </div>
+
+  <div class="term">
+    <div class="top">booking.test.js · 5 edge cases · in-memory DB with real query delay</div>
+    <pre id="out"><span class="dim">Press "Run it". Nothing is sent anywhere; it all runs in this tab.</span></pre>
+  </div>
+  <div id="headline" class="headline"></div>
+
+  <details>
+    <summary>Why it happens, and what the fix changes</summary>
+    <ol><li><b>The race:</b> check and insert are two steps. Both requests pass the check before either inserts. The fix here is a per-room lock around both steps; in Postgres the durable version is an exclusion constraint on (room, time range), so the database refuses the second row.</li><li><b>Back-to-back meetings:</b> inclusive bounds treat 10:00 as inside 09:00-10:00. Half-open ranges fix it.</li><li><b>Double delete:</b> a missing row is read as if it existed. It now returns 404.</li></ol><p>Which of the three race fixes fits depends on your database and how many app instances you run.</p>
+  </details>
+
+  <footer>
+    Built for your Upwork post. Measured work in public: <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">llm-engineering-portfolio</a>.
+    Happy to talk it through in Upwork Messages.
+  </footer>
+</main>
+
+<!--GOATCOUNTER-->
+
+<script>
+  const out = document.getElementById('out'), headline = document.getElementById('headline'), runBtn = document.getElementById('run');
+  let variant = 'naive';
+  document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+    variant = b.dataset.variant;
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+  function log(text, cls) {
+    const s = document.createElement('span');
+    if (!cls) cls = /\b(FAIL|not ok|Error)\b/.test(text) ? 'fail' : /^(\s*)(ok|PASS)\b/.test(text) ? 'ok' : '';
+    if (cls) s.className = cls;
+    s.textContent = text + '\n';
+    out.appendChild(s); out.scrollTop = out.scrollHeight;
+  }
+  function track(name) { try { window.goatcounter && goatcounter.count({ path: location.pathname + '#' + name, title: name, event: true }); } catch (e) {} }
+  runBtn.onclick = async () => {
+    runBtn.disabled = true; out.textContent = ''; headline.className = 'headline'; track('ran-' + variant);
+    try {
+      const r = await runDemo(log, variant);
+      if (r && r.headline) { headline.textContent = r.headline; headline.className = 'headline ' + r.verdict; }
+    } catch (e) { log('Demo error: ' + e.message, 'fail'); }
+    runBtn.disabled = false; runBtn.textContent = 'Run again';
+  };
+</script>
+
+<script src="demo.js"></script>
+</body>
+</html>
