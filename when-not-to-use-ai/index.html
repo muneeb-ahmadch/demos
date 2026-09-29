@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>An AI assistant that knows when not to use AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css?v=e5fc2c33">
+<style>
+  .chat{display:grid;grid-template-columns:1fr 280px}
+  .chat .pane{min-width:0}
+  .ask{display:flex;gap:8px;margin-bottom:14px}
+  .ask input{flex:1;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+  .ask input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--ink2)}
+  .chips button:hover{border-color:var(--accent);color:var(--accent)}
+  .thread{display:flex;flex-direction:column;gap:12px;min-height:180px}
+  .msg{padding:12px 14px;border-radius:12px;font-size:15px;max-width:92%}
+  .msg.you{align-self:flex-end;background:var(--you-soft);color:var(--ink)}
+  .msg.bot{align-self:flex-start;background:var(--soft);border:1px solid var(--line)}
+  .msg.bot.off{background:var(--bad-soft);border-color:#f5c2c2}
+  .route{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+  .route.code{background:var(--you-soft);color:var(--you)}
+  .route.documents{background:var(--ok-soft);color:var(--ok)}
+  .route.declined,.route.rejected{background:var(--warn-soft);color:var(--ben)}
+  .meta{font-size:12px;color:var(--ink3);margin-top:6px}
+  .empty{color:var(--ink3);font-size:14px}
+  .legend p{font-size:14px;color:var(--ink2);margin:0 0 12px}
+  .legend .route{margin:0 6px 0 0}
+  .switch{margin:4px 0 14px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .pair .card{padding:18px}
+  .pair h4{margin:0 0 8px;font-size:15px}
+  .doc{font-size:14px;color:var(--ink2);background:var(--soft);border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin:0 0 16px}
+  .doc mark{background:var(--bad-soft);color:var(--bad);padding:0 2px}
+  .caption{color:var(--ink2);font-size:14px;margin-top:14px}
+  .res .rows{margin-top:6px;font-size:13px;color:var(--ink2)}
+  .res .rows div{padding:3px 0;border-top:1px dashed var(--line)}
+  @media (max-width:900px){.chat,.pair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For your Upwork post · AI engineer, first paid task</p>
+    <h1>An AI assistant that knows when not to use AI.</h1>
+    <p class="lede">You wrote <q>Knows when to use AI and when traditional software logic is more appropriate.</q> So before sending a proposal, I built a small one that does exactly that. Ask it anything below: prices go to plain code, policy questions go to the documents with a citation, and anything the documents don't cover gets an honest "I won't guess".</p>
+    <div class="facts">
+      <span>Real Python, running in your browser</span>
+      <span>Stand-in help centre, no model key needed</span>
+      <span>Built from your post, not from your code</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks" id="cta">Run your 12 edge cases</a>
+      <a class="btn ghost" href="#app-section">Ask it a question</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="checks">
+    <p class="kicker">1 · Your list</p>
+    <h2>Three lines from your post, checked live</h2>
+    <p class="sub">Each line runs its edge cases twice: with my safeguards on (green), and with the same code but every safeguard switched off, which is roughly what a first version looks like.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
+
+  <section id="app-section">
+    <p class="kicker">2 · The app</p>
+    <h2>Ask the assistant</h2>
+    <p class="sub">Try a price ("How much is Business for 12 seats per year?"), a policy question, or something it shouldn't know. Then flip the switch and ask again.</p>
+    <div class="card chat">
+      <div class="pane">
+        <div class="seg switch" id="mode"><button class="on" data-off="0">Safeguards on</button><button data-off="1">All switched off</button></div>
+        <form class="ask" id="askform"><input id="q" placeholder="Ask about plans, refunds, SSO, the API…" autocomplete="off" maxlength="6000"><button class="btn" id="askbtn">Ask</button></form>
+        <div class="chips" id="chips"></div>
+        <div class="thread" id="thread"><p class="empty" id="empty">Answers appear here. The first one loads Python in your browser (about 5 seconds, once).</p></div>
+      </div>
+      <div class="pane legend">
+        <h3>How it decides</h3>
+        <p><span class="route code">code</span>Prices, seat limits and trial dates are computed in Python. A model never does arithmetic on your customer's bill.</p>
+        <p><span class="route documents">documents</span>Policy questions are answered from the retrieved help-centre page, and the answer names its source.</p>
+        <p><span class="route declined">declined</span>If retrieval finds nothing strong enough, it says so and flags it for a person, instead of guessing.</p>
+        <p style="margin:0">One help-centre page has an instruction hidden in it. The assistant drops that sentence before answering.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="moment">
+    <p class="kicker">3 · The hard part, slow motion</p>
+    <h2>When a document talks back</h2>
+    <p class="sub">Assistants read whatever is in the knowledge base, including a page a user wrote. This stand-in page has one line aimed at the assistant:</p>
+    <p class="doc" id="poisoned"></p>
+    <div class="pair">
+      <div class="card"><h4>With the filter</h4><div id="m-on" class="empty">Loading…</div></div>
+      <div class="card"><h4>Without it</h4><div id="m-off" class="empty">Loading…</div></div>
+    </div>
+    <p class="caption">Question asked: <em>"Are all plans free this month?"</em> Without the filter, your support bot promises every customer a free month, in writing.</p>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">4 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the first slice. Here is how it becomes your working implementation, handed over on GitHub.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Agree what "done" means</h4><p>Before code, I write your task's edge cases as tests like the 12 above, so we both know what passing looks like.</p></div>
+      <div class="card step"><div class="n">2</div><h4>Put the model behind the safeguards</h4><p>OpenAI or Anthropic writes the answers from the same retrieved passages and cites the same ids. The router, refusal and filter stay in code, and the tests run on every change.</p></div>
+      <div class="card step"><div class="n">3</div><h4>Ship it clean</h4><p>FastAPI endpoint, your React or Next.js front end, setup docs, and a short walkthrough on an Upwork call.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the edge-case run, the test suite and the router</summary>
+        <div class="devbody">
+          <p>Opening this runs <code>edge_cases.py</code> in your browser, then shows the recorded pytest run of the FastAPI app (FastAPI doesn't run in a browser tab). Standard library only for the core; BM25 retrieval, no vector database for eight pages.</p>
+          <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
+          <pre>def answer(question, settings=None, writer=extractive_writer):
+    # 1. validate input   2. exact questions -> code   3. retrieve (BM25)
+    # 4. below MIN_SCORE -> decline   5. drop instruction-like sentences
+    # 6. writer answers from the passages only, citing the doc id</pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured engineering work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">github.com/muneeb-ahmadch/llm-engineering-portfolio</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="kit.js?v=e9f4dc36"></script>
+<script src="app.js?v=a4e6154e"></script>
+</body>
+</html>
