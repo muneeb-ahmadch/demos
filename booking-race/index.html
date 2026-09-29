@@ -4,93 +4,309 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Meeting-room booking: the double-booking race, live</title>
+<title>Your meeting-room booking service, first slice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0f172a;--panel:#111c33;--line:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--ok:#4ade80;--fail:#f87171;--cmd:#93c5fd;--accent:#38bdf8}
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1c1917; --ink2:#57534e; --ink3:#a8a29e; --line:#e7e5e4; --soft:#faf9f6;
+    --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#e6f4f1;
+    --ok:#15803d; --ok-soft:#e8f6ec; --bad:#b91c1c; --bad-soft:#fdecec; --warn-soft:#fff7e6;
+    --ana:#0e7490; --ana-soft:#e0f2f7; --ben:#c2410c; --ben-soft:#fdeee4; --you:#4f46e5; --you-soft:#ebeafd;
+    --shadow:0 1px 2px rgba(28,25,23,.05),0 10px 30px rgba(28,25,23,.06);
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,Helvetica,Arial,sans-serif}
-  main{max-width:860px;margin:0 auto;padding:28px 16px 40px}
-  h1{font-size:22px;line-height:1.3;margin:0 0 8px;color:#f8fafc}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
-  .tag{display:inline-block;font:600 11px/1 Menlo,monospace;letter-spacing:.04em;text-transform:uppercase;padding:5px 8px;border-radius:4px;background:#1e293b;color:var(--muted);margin-bottom:12px}
-  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}
-  button{font:600 15px -apple-system,Helvetica,sans-serif;border:0;border-radius:8px;padding:12px 22px;cursor:pointer;background:var(--accent);color:#04111f}
-  button:disabled{opacity:.5;cursor:wait}
-  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .seg button{background:transparent;color:var(--muted);border-radius:0;padding:10px 14px;font-weight:500}
-  .seg button[aria-pressed=true]{background:#1e293b;color:var(--text)}
-  .term{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .term .top{padding:8px 14px;border-bottom:1px solid var(--line);font:12px Menlo,monospace;color:var(--muted)}
-  pre{margin:0;padding:14px;min-height:220px;max-height:60vh;overflow:auto;white-space:pre-wrap;word-break:break-word;font:13.5px/1.6 Menlo,Consolas,monospace}
-  .ok{color:var(--ok)}.fail{color:var(--fail)}.cmd{color:var(--cmd)}.dim{color:var(--muted)}
-  .headline{margin:16px 0 0;padding:14px 16px;border-radius:10px;border:1px solid var(--line);font-size:17px;font-weight:600;display:none}
-  .headline.fail{display:block;border-color:#7f1d1d;background:#2a1215}
-  .headline.ok{display:block;border-color:#14532d;background:#0f2417}
-  details{margin-top:20px;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--panel)}
-  summary{cursor:pointer;font-weight:600}
-  details p,details li{color:#cbd5e1;font-size:14px}
-  footer{margin-top:28px;color:var(--muted);font-size:13px}
-  footer a{color:var(--cmd)}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  button{font:inherit;cursor:pointer}
+  code,pre,.mono{font-family:"JetBrains Mono",Menlo,Consolas,monospace}
+
+  /* hero */
+  .hero{padding:56px 0 20px}
+  .eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:6px 12px;border-radius:999px;margin:0 0 20px}
+  h1{font-size:44px;line-height:1.1;letter-spacing:-.025em;margin:0 0 18px;max-width:820px}
+  .lede{font-size:19px;color:var(--ink2);max-width:720px;margin:0 0 22px}
+  .lede q{color:var(--ink);font-style:italic}
+  .facts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+  .facts span{font-size:13px;color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:999px}
+  .from{display:flex;align-items:center;gap:12px;color:var(--ink2);font-size:14px}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:600;font-size:14px}
+  .jump{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+
+  /* buttons */
+  .btn{border:0;border-radius:10px;padding:11px 18px;font-weight:600;font-size:15px;background:var(--accent);color:var(--accent-ink);transition:transform .08s,box-shadow .15s;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+  a.btn{display:inline-block;text-decoration:none}
+  .btn:hover{box-shadow:0 4px 14px rgba(15,118,110,.25)}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn.small{padding:7px 12px;font-size:13px;border-radius:8px}
+  .link{background:none;border:0;padding:0;color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* sections */
+  section{padding:44px 0 8px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:0 0 6px}
+  h2{font-size:28px;line-height:1.2;letter-spacing:-.015em;margin:0 0 8px}
+  .sub{color:var(--ink2);margin:0 0 22px;max-width:720px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+  /* checklist */
+  .checks{padding:6px 0}
+  .checks-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 22px 10px;border-bottom:1px solid var(--line)}
+  .checks-head .score{font-weight:600;color:var(--ink2);font-size:14px}
+  .check{display:grid;grid-template-columns:30px 1fr auto;gap:14px;align-items:start;padding:16px 22px;border-bottom:1px solid var(--line)}
+  .check:last-child{border-bottom:0}
+  .icon{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;margin-top:1px;color:var(--ink3);font-size:14px;transition:all .25s}
+  .icon.ok{background:var(--ok);border-color:var(--ok);color:#fff;transform:scale(1.06)}
+  .icon.run{border-color:var(--accent);color:var(--accent)}
+  .check .req{font-weight:500}
+  .check .req small{display:block;color:var(--ink3);font-weight:400;font-size:12px;margin-top:2px}
+  .res{margin-top:8px;font-size:14px;display:none}
+  .res.show{display:block;animation:fade .3s}
+  .res .mine{color:var(--ok);font-weight:600}
+  .res .typical{color:var(--ink2);margin-top:2px}
+  .res .typical b{color:var(--bad);font-weight:600}
+  @keyframes fade{from{opacity:0;transform:translateY(-3px)}to{opacity:1}}
+
+  /* app */
+  .app{display:grid;grid-template-columns:190px 1fr 300px;overflow:hidden}
+  .pane{padding:18px}
+  .pane + .pane{border-left:1px solid var(--line)}
+  .pane h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:0 0 12px}
+  .room{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:10px;padding:10px 12px;margin-bottom:6px;color:var(--ink)}
+  .room:hover{background:var(--soft)}
+  .room.active{background:var(--accent-soft);border-color:#b6e0d8}
+  .room-name{font-weight:600}
+  .room-cap{font-size:12px;color:var(--ink2)}
+  .dayhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .dayhead strong{font-size:17px}
+  .seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{border:0;background:none;padding:6px 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--ink2)}
+  .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .timeline{position:relative;border-top:1px solid var(--line);cursor:copy;user-select:none}
+  .hour{height:52px;border-bottom:1px solid var(--line);position:relative}
+  .hour span{position:absolute;left:0;top:-9px;font-size:11px;color:var(--ink3);background:var(--card);padding-right:6px}
+  .past{position:absolute;left:44px;right:0;top:0;background:repeating-linear-gradient(135deg,#f5f5f4 0 6px,#fafaf9 6px 12px);pointer-events:none}
+  .block{position:absolute;left:50px;right:6px;border-radius:9px;padding:5px 10px;font-size:13px;line-height:1.3;overflow:hidden;cursor:pointer;border-left:4px solid;transition:box-shadow .15s}
+  .block:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+  .block .t{font-weight:600}
+  .block .m{color:var(--ink2);font-size:12px}
+  .block.Ana{background:var(--ana-soft);border-color:var(--ana)}
+  .block.Ben{background:var(--ben-soft);border-color:var(--ben)}
+  .block.You{background:var(--you-soft);border-color:var(--you)}
+  .block.new{animation:pop .5s}
+  @keyframes pop{0%{transform:scale(.96);opacity:0}100%{transform:none;opacity:1}}
+  .block .cancel{position:absolute;right:8px;top:6px;display:none}
+  .block.sel .cancel{display:inline-block}
+  .preview{position:absolute;left:50px;right:6px;border-radius:9px;border:2px dashed var(--accent);background:rgba(15,118,110,.05);pointer-events:none;font-size:12px;color:var(--accent);padding:4px 10px;font-weight:600}
+  .preview.bad{border-color:var(--bad);background:rgba(185,28,28,.05);color:var(--bad)}
+  .loading{position:absolute;inset:0;background:rgba(255,255,255,.65);display:none;place-items:center;font-size:13px;color:var(--ink2);z-index:3}
+  .loading.show{display:grid}
+  label{display:block;font-size:13px;font-weight:600;margin:0 0 5px;color:var(--ink2)}
+  input,select{width:100%;font:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);margin-bottom:12px}
+  input:focus,select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .where{font-size:14px;margin:0 0 14px;padding:10px 12px;background:var(--soft);border-radius:9px}
+  .field-msg{font-size:13px;color:var(--bad);min-height:0;margin:-4px 0 10px;display:none}
+  .field-msg.show{display:block}
+  .alert{font-size:14px;border-radius:10px;padding:12px 14px;margin-top:12px;display:none}
+  .alert.show{display:block;animation:fade .3s}
+  .alert.bad{background:var(--bad-soft);color:#7f1d1d}
+  .alert.ok{background:var(--ok-soft);color:#14532d}
+  .alert .note{display:block;margin-top:8px;font-size:12px;color:var(--ink2);font-style:italic}
+  .alert .btn{margin-top:10px}
+  .ghostbox{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink2)}
+  .ghostbox .btn{margin-top:8px}
+
+  /* race */
+  .race{padding:22px}
+  .race-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+  .laptops{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .laptop{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--soft)}
+  .chrome{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#efece6;font-size:12px;color:var(--ink2);font-weight:600}
+  .chrome i{width:9px;height:9px;border-radius:50%;background:#d6d3d1;display:inline-block}
+  .screen{padding:16px;min-height:132px}
+  .screen .slot{font-size:14px;color:var(--ink2);margin-bottom:12px}
+  .screen .slot b{color:var(--ink)}
+  .status{margin-top:12px;font-size:14px;font-weight:600;min-height:22px}
+  .status.ok{color:var(--ok)}.status.bad{color:var(--bad)}.status.wait{color:var(--ink2);font-weight:500}
+  .status small{display:block;font-weight:500;color:var(--ink2);margin-top:2px}
+  .strip{margin-top:20px}
+  .strip-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:4px}
+  .strip-track{position:relative;height:74px;background:var(--soft);border:1px solid var(--line);border-radius:10px}
+  .sb{position:absolute;height:28px;border-radius:7px;font-size:12px;font-weight:600;display:flex;align-items:center;padding:0 10px;white-space:nowrap;overflow:hidden;animation:pop .4s}
+  .sb.Ana{background:var(--ana-soft);color:var(--ana);border:1px solid var(--ana)}
+  .sb.Ben{background:var(--ben-soft);color:var(--ben);border:1px solid var(--ben)}
+  .sb.clash{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+  .caption{margin-top:16px;padding:14px 16px;border-radius:10px;font-size:15px;display:none}
+  .caption.show{display:block;animation:fade .3s}
+  .caption.bad{background:var(--bad-soft);color:#7f1d1d}
+  .caption.ok{background:var(--ok-soft);color:#14532d}
+  .caption.meh{background:var(--warn-soft);color:#7c4a03}
+
+  /* plan */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step{padding:20px}
+  .step .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;margin-bottom:12px}
+  .step h4{margin:0 0 6px;font-size:16px}
+  .step p{margin:0;color:var(--ink2);font-size:14px}
+
+  /* dev */
+  details.dev{margin-top:10px}
+  details.dev summary{cursor:pointer;padding:16px 22px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+  details.dev summary::after{content:"+";color:var(--ink3);font-weight:400}
+  details.dev[open] summary::after{content:"−"}
+  .devbody{padding:0 22px 22px}
+  .devbody p{color:var(--ink2);font-size:14px}
+  pre{background:#1c1917;color:#e7e5e4;border-radius:10px;padding:14px 16px;font-size:12.5px;line-height:1.6;overflow:auto;white-space:pre-wrap;margin:0 0 14px}
+  pre .ok{color:#86efac}pre .fail{color:#fca5a5}pre .dim{color:#a8a29e}pre .cmd{color:#93c5fd}
+
+  footer{padding:48px 0 60px;color:var(--ink2);font-size:14px}
+  footer .card{padding:22px;display:flex;gap:16px;align-items:center}
+  footer a{color:var(--accent);font-weight:600}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;z-index:9}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  .pane,.check > div,.laptop,.step{min-width:0}
+  @media (max-width:900px){
+    h1{font-size:32px}.lede{font-size:17px}
+    .app{grid-template-columns:1fr}
+    .pane + .pane{border-left:0;border-top:1px solid var(--line)}
+    #rooms{display:flex;gap:8px;overflow-x:auto}
+    .room{margin:0;min-width:120px}
+    .laptops,.steps{grid-template-columns:1fr}
+    .check{grid-template-columns:26px 1fr;padding:14px 16px}
+    .check .btn{grid-column:2;justify-self:start}
+  }
 </style>
 </head>
 <body>
-<main>
-  <span class="tag">runs in your browser · stand-in service, not your code</span>
-  <h1>Meeting-room booking: the double-booking race, live</h1>
-  <p class="sub">A booking API written the way it is usually written first: check for an overlap, then insert. Every manual test passes. Press Run and two people book the same room at the same moment, 100 times.</p>
 
-  <div class="bar">
-    <button id="run">Run it</button>
-    <div class="seg" role="group" aria-label="Version">
-      <button data-variant="naive" aria-pressed="true">As usually written</button>
-      <button data-variant="fixed" aria-pressed="false">With the fix</button>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For your Upwork post · Meeting-room booking service</p>
+    <h1>Your booking service, with the hard part already working.</h1>
+    <p class="lede">You wrote that the challenge <q>is not the CRUD itself, but correctly handling booking conflicts, concurrent requests, and edge cases.</q> So before sending a proposal, I built that part first. Try it below: book rooms, race two users against each other, and run your own edge-case list.</p>
+    <div class="facts">
+      <span>Runs entirely in your browser</span>
+      <span>In-memory backend with network latency, a storage option you listed</span>
+      <span>Built from your post, not from your code</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks">Run your edge cases</a>
+      <a class="btn ghost" href="#race">Watch two users collide</a>
     </div>
   </div>
+</header>
 
-  <div class="term">
-    <div class="top">booking.test.js · 5 edge cases · in-memory DB with random query latency</div>
-    <pre id="out"><span class="dim">Press "Run it". Nothing is sent anywhere; it all runs in this tab.</span></pre>
-  </div>
-  <div id="headline" class="headline"></div>
+<main class="wrap">
 
-  <details>
-    <summary>Why it happens, and what the fix changes</summary>
-    <ol><li><b>The race:</b> check and insert are two steps. Both requests pass the check before either inserts. The fix here is a per-room lock around both steps; in Postgres the durable version is an exclusion constraint on (room, time range), so the database refuses the second row.</li><li><b>Back-to-back meetings:</b> inclusive bounds treat 10:00 as inside 09:00-10:00. Half-open ranges fix it.</li><li><b>Double delete:</b> a missing row is read as if it existed. It now returns 404.</li></ol><p>Which of the three race fixes fits depends on your database and how many app instances you run.</p>
-  </details>
+  <section id="checks">
+    <p class="kicker">1 · Your list</p>
+    <h2>The edge cases from your post, checked live</h2>
+    <p class="sub">Each check runs against my version, and against the way this usually gets written first (check for an overlap, then insert), so you can see what each one protects you from.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score">0 of 5 checked</span><button class="btn small" id="runall">Run all 5</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
 
-  <footer>
-    Built for your Upwork post. Measured work in public: <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">llm-engineering-portfolio</a>.
-    Happy to talk it through in Upwork Messages.
-  </footer>
+  <section id="app-section">
+    <p class="kicker">2 · The app</p>
+    <h2>Rooms, a day view, and a booking form</h2>
+    <p class="sub">Click an empty time to start a booking. The form validates as you type. To see the conflict your post describes, the one that only appears after the form looked valid, use <em>"Let Ben take it first"</em> before you press Book.</p>
+    <div class="card app">
+      <div class="pane"><h3>Rooms</h3><div id="rooms"></div></div>
+      <div class="pane">
+        <div class="dayhead"><strong id="dayTitle"></strong><div class="seg" id="daySeg"><button data-day="0">Today</button><button data-day="1">Tomorrow</button></div></div>
+        <div class="timeline" id="timeline"><div class="loading" id="loading"><span><span class="spin"></span>&nbsp; Loading bookings…</span></div></div>
+      </div>
+      <div class="pane">
+        <h3>New booking</h3>
+        <p class="where" id="where"></p>
+        <label for="f-title">Title</label>
+        <input id="f-title" value="Sprint planning" maxlength="60">
+        <div class="row2">
+          <div><label for="f-start">Start</label><select id="f-start"></select></div>
+          <div><label for="f-end">End</label><select id="f-end"></select></div>
+        </div>
+        <label for="f-who">Booked by</label>
+        <select id="f-who"><option>You</option><option>Ana</option><option>Ben</option></select>
+        <p class="field-msg" id="f-msg"></p>
+        <button class="btn" id="f-book" style="width:100%">Book room</button>
+        <div class="alert" id="alert"></div>
+        <div class="ghostbox">Another user, on another laptop, grabs this exact slot while your form is open. Your screen doesn't know yet.
+          <br><button class="btn ghost small" id="ghost">Let Ben take it first</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="race">
+    <p class="kicker">3 · The race, in slow motion</p>
+    <h2>Two people press "Book" at the same moment</h2>
+    <p class="sub">This is the bug most booking systems ship with, because every manual test passes. Switch between the usual first version and mine, then press the button a few times.</p>
+    <div class="card race">
+      <div class="race-top">
+        <div class="seg" id="raceSeg"><button data-mode="usual">Usual first version</button><button data-mode="mine" class="on">My version</button></div>
+        <button class="btn" id="raceBtn">Both press Book at the same moment</button>
+      </div>
+      <div class="laptops">
+        <div class="laptop"><div class="chrome"><i></i><i></i><i></i>&nbsp; Ana's laptop</div><div class="screen"><div class="slot"><b>Borealis</b> · <span class="tmr"></span> · 14:00–15:00</div><button class="btn small" disabled>Book room</button><div class="status" id="st-Ana"></div></div></div>
+        <div class="laptop"><div class="chrome"><i></i><i></i><i></i>&nbsp; Ben's laptop</div><div class="screen"><div class="slot"><b>Borealis</b> · <span class="tmr"></span> · 14:00–15:00</div><button class="btn small" disabled>Book room</button><div class="status" id="st-Ben"></div></div></div>
+      </div>
+      <div class="strip">
+        <div class="strip-scale"><span>13:00</span><span>14:00</span><span>15:00</span><span>16:00</span></div>
+        <div class="strip-track" id="strip"></div>
+      </div>
+      <div class="caption" id="caption"></div>
+    </div>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">4 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the first slice. Here is how it becomes the repository, test suite and README you asked for.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Backend that can't double-book</h4><p>Node + TypeScript on Fastify, your four endpoints. In Postgres the database itself refuses overlapping bookings (an exclusion constraint), so it holds even with several API servers running. A clash comes back as a 409 carrying the booking it hit.</p></div>
+      <div class="card step"><div class="n">2</div><h4>React front end</h4><p>Rooms list, day view and booking form with client-side validation, as above. A late conflict refreshes the day and offers the next free slot instead of showing an error. Hooks and context only, with loading and error states on every call.</p></div>
+      <div class="card step"><div class="n">3</div><h4>Tests and README</h4><p>The concurrency test from this page, run against real Postgres, plus every edge case on your list. The README explains why a constraint beats locks or optimistic checks here, and suggests next steps.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the test run and the database constraint</summary>
+        <div class="devbody">
+          <p>The same five cases as above, as a test file, run in this tab against both versions:</p>
+          <pre id="testout"><span class="dim">Opening this section runs the tests…</span></pre>
+          <p>What guarantees it in the real build (Postgres). In this browser demo there is no database, so a per-room lock stands in for it:</p>
+<pre><span class="dim">-- the database refuses overlaps itself, whatever the app servers do</span>
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
+  EXCLUDE USING gist (room_id WITH =, tstzrange(start_time, end_time, '[)') WITH &amp;&amp;);
+<span class="dim">-- '[)' is half-open: a 10:00 end and a 10:00 start do not collide (your back-to-back rule)
+-- the API maps SQLSTATE 23P01 (exclusion_violation) to 409 + the conflicting booking</span></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
 </main>
 
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured engineering work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">llm-engineering-portfolio</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
 <!--GOATCOUNTER-->
-
-<script>
-  const out = document.getElementById('out'), headline = document.getElementById('headline'), runBtn = document.getElementById('run');
-  let variant = 'naive';
-  document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
-    variant = b.dataset.variant;
-    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
-  });
-  function log(text, cls) {
-    const s = document.createElement('span');
-    if (!cls) cls = /\b(FAIL|not ok|Error)\b/.test(text) ? 'fail' : /^(\s*)(ok|PASS)\b/.test(text) ? 'ok' : '';
-    if (cls) s.className = cls;
-    s.textContent = text + '\n';
-    out.appendChild(s); out.scrollTop = out.scrollHeight;
-  }
-  function track(name) { try { window.goatcounter && goatcounter.count({ path: location.pathname + '#' + name, title: name, event: true }); } catch (e) {} }
-  runBtn.onclick = async () => {
-    runBtn.disabled = true; out.textContent = ''; headline.className = 'headline'; track('ran-' + variant);
-    try {
-      const r = await runDemo(log, variant);
-      if (r && r.headline) { headline.textContent = r.headline; headline.className = 'headline ' + r.verdict; }
-    } catch (e) { log('Demo error: ' + e.message, 'fail'); }
-    runBtn.disabled = false; runBtn.textContent = 'Run again';
-  };
-</script>
-
-<script src="demo.js?v=2633f616"></script>
+<script src="app.js?v=4af1b7fc"></script>
 </body>
 </html>
