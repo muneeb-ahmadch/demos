@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Your inquiry agent, first slice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css?v=e5fc2c33">
+<style>
+  .desk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px}
+  #inbox{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
+  .msg{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;text-align:left;border:1px solid var(--line,#e5e2da);background:transparent;border-radius:10px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
+  .msg.on{border-color:var(--accent,#2f6f5e);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#2f6f5e) 20%,transparent)}
+  .msg .who{font-weight:600}.msg .b{justify-self:end;font-size:12px;padding:1px 8px;border-radius:99px}
+  .msg .txt{grid-column:1/-1;font-size:13px;opacity:.8}
+  .b.ok{background:#e3f1ea;color:#1f6b4b}.b.warn{background:#fdf0dc;color:#8a5a12}.b.bad{background:#fbe4e2;color:#a0332b}.b.dim{background:#eeece7;color:#6b665c}
+  #detail .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.04em;opacity:.6;margin:12px 0 2px}
+  #detail .quote{font-style:italic}.draft{background:#f4f7f5;border-radius:8px;padding:8px 10px}.draft.bad{background:#fbe4e2}
+  .own{display:flex;gap:8px;margin-top:14px}.own input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line,#e5e2da);border-radius:10px;font:inherit}
+  @media (max-width:640px){.desk{grid-template-columns:1fr}.own{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For your Upwork post · AI agents for your sales funnel</p>
+    <h1>Your inquiry agent, with the part that can embarrass you already handled.</h1>
+    <p class="lede">You wrote <q>sending emails, and responding to inquiries</q> on a high-traffic website. An agent that answers customers on its own can promise a discount or a refund nobody approved. So before sending a proposal, I built that part first. Run your list below, then try the inbox.</p>
+    <div class="facts">
+      <span>Runs entirely in your browser</span>
+      <span>12 stand-in inquiries and a stand-in fact sheet</span>
+      <span>Built from your post, not from your code</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks">Run your list</a>
+      <a class="btn ghost" href="#app-section">Open the inbox</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="checks">
+    <p class="kicker">1 · Your list</p>
+    <h2>The tasks from your post, checked live</h2>
+    <p class="sub">Green is this version. Grey is what the usual first version does with the same 12 inquiries: an agent told to be helpful, with nothing stopping it.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
+
+  <section id="app-section">
+    <p class="kicker">2 · The app</p>
+    <h2>The inbox</h2>
+    <p class="sub">Click any inquiry to see what the agent did and why. Switch to the usual version to compare, or type your own customer question.</p>
+    <div class="card">
+      <div class="seg" id="seg"><button class="on" data-side="mine">My version</button><button data-side="usual">The usual version</button></div>
+      <div class="desk"><div id="inbox"></div><div id="detail" class="card"></div></div>
+      <div class="own"><input id="own" placeholder="Type a customer question, e.g. Can I get a refund?" maxlength="200"><button class="btn small" id="try">Ask the agent</button></div>
+    </div>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">3 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the first slice. Here is how it becomes the automated sales and marketing system in your post.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Your facts and your rules</h4><p>With you (the director), write down what the agent may say on its own and what always comes to you: prices, discounts, refunds, custom quotes.</p></div>
+      <div class="card step"><div class="n">2</div><h4>Connect your site and tools</h4><p>Your site form and inbox feed in; leads land in your CRM or sheet, keyed so a retry never duplicates; emails go out through your sender with the unsubscribe list respected.</p></div>
+      <div class="card step"><div class="n">3</div><h4>A model behind the rules, measured</h4><p>A language model drafts the replies, only from your facts, and a test set of real inquiries is re-run before every change, so nothing goes live that makes promises.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the run on all 12 inquiries</summary>
+        <div class="devbody">
+          <p>The same pipeline, logged. In the real build a model writes the drafts; the dedupe, the do-not-email list and the director routing stay as plain code in front of it, so a model mistake cannot send an unapproved promise.</p>
+          <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured engineering work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/09-answer-defense">github.com/muneeb-ahmadch/llm-engineering-portfolio</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="kit.js?v=e9f4dc36"></script>
+<script src="app.js?v=87b88568"></script>
+</body>
+</html>
