@@ -20,6 +20,7 @@ const ESCALATE = [
 const UNKNOWN = { why: 'Not in the fact sheet', because: 'the agent does not guess', draft: (n) => `Hi ${n}, `, learn: true };
 const SPAM = /backlink|crypto|click here|guaranteed traffic/i;
 const STOP = /stop emailing|unsubscribe/i;
+const FOLLOW = /follow(ing)? up|any news|any update|still waiting|heard back/i;
 
 // ---- a stand-in morning: 12 inquiries, shaped like a busy site's inbox ----
 const INBOX = [
@@ -48,8 +49,9 @@ function decideMine(q, st) {
   if (SPAM.test(q.text)) return { kind: 'drop', key, topic: 'spam' };
   if (STOP.test(q.text)) { st.suppressed.add(key); return { kind: 'suppress', key, topic: 'unsubscribe', reply: "Understood. You won't get any more emails from us." }; }
   const repeat = st.sheet.has(key), prev = st.sheet.get(key);
-  // a vague follow-up ("any news?") stays with the director; a new question the fact sheet answers does not
-  const esc = ESCALATE.find((e) => e.re.test(q.text)) || (repeat && !FACTS.some((f) => f.match.test(q.text)) && ESCALATE.find((e) => e.re.test(st.last.get(key) || '')));
+  // a follow-up ("any news?") stays in the director's thread; a new question is judged on its own
+  const followUp = repeat && FOLLOW.test(q.text) && ESCALATE.find((e) => e.re.test(st.last.get(key) || ''));
+  const esc = ESCALATE.find((e) => e.re.test(q.text)) || followUp;
   const fact = !esc && FACTS.find((f) => f.match.test(q.text));
   const route = esc || (fact ? null : UNKNOWN);
   const topic = route ? route.why.toLowerCase() : fact.label;
@@ -60,7 +62,8 @@ function decideMine(q, st) {
   });
   st.last.set(key, q.text);
   const emailOk = !st.suppressed.has(key);
-  if (route) return { kind: 'escalate', key, repeat, route, topic, emailOk, reply: repeat ? `Thanks${n ? ' ' + n : ''}, your answer from our director is on its way today.` : hold(n) };
+  const chasing = repeat && FOLLOW.test(q.text);
+  if (route) return { kind: 'escalate', key, repeat, route, topic, emailOk, reply: chasing ? `Thanks${n ? ' ' + n : ''}, your answer from our director is on its way today.` : hold(n) };
   return { kind: 'reply', key, repeat, fact, topic, emailOk, reply: `${n ? 'Hi ' + n + '! ' : ''}${fact.answer}` };
 }
 // the typical first version: a "be helpful" agent with no limits, an append-only sheet, a welcome email for every message
