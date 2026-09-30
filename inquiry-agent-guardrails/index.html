@@ -10,17 +10,108 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="kit.css?v=e5fc2c33">
 <style>
-  .desk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px}
-  #inbox{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
-  .msg{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;text-align:left;border:1px solid var(--line,#e5e2da);background:transparent;border-radius:10px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
-  .msg.on{border-color:var(--accent,#2f6f5e);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#2f6f5e) 20%,transparent)}
-  .msg .who{font-weight:600}.msg .b{justify-self:end;font-size:12px;padding:1px 8px;border-radius:99px}
-  .msg .txt{grid-column:1/-1;font-size:13px;opacity:.8}
-  .b.ok{background:#e3f1ea;color:#1f6b4b}.b.warn{background:#fdf0dc;color:#8a5a12}.b.bad{background:#fbe4e2;color:#a0332b}.b.dim{background:#eeece7;color:#6b665c}
-  #detail .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.04em;opacity:.6;margin:12px 0 2px}
-  #detail .quote{font-style:italic}.draft{background:#f4f7f5;border-radius:8px;padding:8px 10px}.draft.bad{background:#fbe4e2}
-  .own{display:flex;gap:8px;margin-top:14px}.own input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line,#e5e2da);border-radius:10px;font:inherit}
-  @media (max-width:640px){.desk{grid-template-columns:1fr}.own{flex-direction:column}}
+  /* hero value cards */
+  .values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:4px 0 26px;max-width:960px}
+  .value{padding:16px 18px}
+  .value .ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:16px;margin-bottom:10px}
+  .value h3{font-size:15px;margin:0 0 4px}
+  .value p{font-size:14px;color:var(--ink2);margin:0}
+  .ico.g{background:var(--ok-soft)}.ico.b{background:var(--ana-soft)}.ico.a{background:var(--warn-soft)}
+
+  /* section 1: the morning */
+  .sim{padding:18px}
+  .sim-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .clock{margin-left:auto;font:500 14px "JetBrains Mono",monospace;color:var(--ink2);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+  .ticker{font-size:14px;color:var(--ink2);min-height:22px}
+  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat b{display:block;font-size:26px;line-height:1.1;letter-spacing:-.02em}
+  .stat span{font-size:12.5px;color:var(--ink2)}
+  .stat.good b{color:var(--ok)}.stat.you b{color:#b45309}
+  .lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .lane{border-radius:14px;padding:12px;min-height:180px;min-width:0}
+  .lane.ans{background:var(--ok-soft)}.lane.you{background:var(--warn-soft)}.lane.out{background:#f1efea}
+  .lane h4{margin:0 0 2px;font-size:14px;display:flex;justify-content:space-between}
+  .lane .hint{font-size:12.5px;color:var(--ink2);margin:0 0 10px}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px;font-size:13.5px;animation:pop .35s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .item .meta{font-size:12px;color:var(--ink3);margin-bottom:3px}.item .meta b{color:var(--ink);font-size:13px}
+  .item .q{margin:0 0 6px;color:var(--ink2)}
+  .item .a{margin:0 0 6px;background:var(--accent-soft);border-radius:10px 10px 10px 3px;padding:7px 10px;color:var(--ink)}
+  .item .tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:99px;padding:1px 8px;margin-right:4px}
+  .tag.g{background:var(--ok-soft);color:var(--ok)}.tag.a{background:#fdecc8;color:#92400e}.tag.n{background:#eeece7;color:var(--ink2)}
+  .item .told{font-size:12.5px;color:var(--ink2);margin:4px 0 8px}
+  .item textarea{width:100%;min-height:78px;border:1px solid var(--line);border-radius:9px;padding:8px;font:inherit;font-size:13px;resize:vertical;margin:6px 0}
+  .item .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .item .learn{font-size:12.5px;color:var(--ink2);display:flex;gap:6px;align-items:center;flex-basis:100%}
+  .item.sent{border-color:#bbe5c8}
+  .follow{border-top:1px dashed var(--line);margin-top:8px;padding-top:8px}
+  .sheet{margin-top:16px;border:1px solid var(--line);border-radius:12px;overflow:auto}
+  .sheet h4{margin:0;padding:10px 14px;font-size:14px;border-bottom:1px solid var(--line);background:var(--soft);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .sheet h4 small{font-weight:400;color:var(--ink2)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:8px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-size:12px;color:var(--ink3);font-weight:600}
+  tr.flash td{animation:flash 1.2s ease}
+  @keyframes flash{from{background:#fff4c2}to{background:transparent}}
+  .st{font-size:12px;font-weight:600;border-radius:99px;padding:2px 9px}
+  .empty-row td{color:var(--ink3);text-align:center;white-space:normal}
+  .usual{margin-top:16px;border:1px solid #f3c9c9;background:var(--bad-soft);border-radius:14px;padding:16px 18px;display:none}
+  .usual.show{display:block;animation:pop .4s ease}
+  .usual h4{margin:0 0 6px;font-size:15px}
+  .usual ul{margin:0 0 10px;padding-left:20px;color:var(--ink2);font-size:14px}
+  .bad-replies{display:none;margin-top:8px}
+  .bad-replies.show{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .badr{background:var(--card);border-radius:10px;padding:9px 12px;font-size:13.5px;border:1px solid #f3c9c9}
+  .badr .bubble{background:#fde2e2;border-radius:10px 10px 10px 3px;padding:6px 10px;margin:4px 0}
+  .badr small{color:var(--bad);font-weight:600}
+
+  /* section 2: try it as a customer */
+  .tryit{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:0;overflow:hidden}
+  .site{background:#eceae4;padding:18px;border-right:1px solid var(--line);min-width:0}
+  .site-bar{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:10px 10px 0 0;padding:8px 12px;border:1px solid var(--line);border-bottom:0}
+  .site-bar i{width:9px;height:9px;border-radius:50%;background:#e2ded6;display:inline-block}
+  .site-bar span{margin-left:10px;font-size:12px;color:var(--ink3);background:var(--soft);border-radius:6px;padding:2px 10px;flex:1}
+  .widget{background:var(--card);border:1px solid var(--line);border-radius:0 0 14px 14px;display:flex;flex-direction:column;height:470px}
+  .w-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .w-head .dot{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+  .w-head b{font-size:14px;display:block}.w-head small{font-size:12px;color:var(--ok)}
+  .w-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+  .bub{max-width:85%;padding:8px 12px;border-radius:14px;font-size:14px;line-height:1.45;animation:pop .25s ease}
+  .bub.bot{background:var(--soft);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .bub.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+  .bub.sys{align-self:center;background:none;color:var(--ink3);font-size:12.5px;padding:2px}
+  .typing{align-self:flex-start;color:var(--ink3);font-size:13px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 11px;font-size:12.5px;color:var(--ink)}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .w-in{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line)}
+  .w-in input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;font-size:14px}
+  .behind{padding:20px 22px;min-width:0}
+  .behind h4{margin:0 0 4px;font-size:15px}
+  .behind .hint{font-size:13px;color:var(--ink2);margin:0 0 14px}
+  .trace{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .trace li{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;font-size:14px;animation:pop .3s ease}
+  .trace .n{width:24px;height:24px;border-radius:50%;background:var(--soft);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--ink2)}
+  .trace li.ok .n{background:var(--ok-soft);border-color:#bbe5c8;color:var(--ok)}
+  .trace li.you .n{background:var(--warn-soft);border-color:#f5d9a6;color:#92400e}
+  .trace b{display:block;font-size:13.5px}.trace span{color:var(--ink2);font-size:13.5px}
+  .trace-empty{color:var(--ink3);font-size:14px}
+  .honest{font-size:12.5px;color:var(--ink3);margin:16px 0 0;border-top:1px solid var(--line);padding-top:12px}
+
+  @media (max-width:900px){
+    .values,.lanes,.tryit{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .site{border-right:0;border-bottom:1px solid var(--line)}
+    .bad-replies.show{grid-template-columns:1fr}
+  }
+  @media (max-width:560px){
+    h1{font-size:32px}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .clock{margin-left:0}
+    .site{padding:10px}
+    .widget{height:430px}
+  }
 </style>
 </head>
 <body>
@@ -28,52 +119,107 @@
 <header class="hero">
   <div class="wrap">
     <p class="eyebrow">For your Upwork post · AI agents for your sales funnel</p>
-    <h1>Your inquiry agent, with the part that can embarrass you already handled.</h1>
-    <p class="lede">You wrote <q>sending emails, and responding to inquiries</q> on a high-traffic website. An agent that answers customers on its own can promise a discount or a refund nobody approved. So before sending a proposal, I built that part first. Run your list below, then try the inbox.</p>
+    <h1>Every inquiry answered in seconds. Only the real decisions reach you.</h1>
+    <p class="lede">You asked for AI agents for <q>collecting and organizing data, uploading information, sending emails, and responding to inquiries</q>. Before applying, I built the first slice of that system. Press play and watch it handle a morning of inquiries on your site.</p>
+    <div class="values">
+      <div class="card value"><div class="ico g">💬</div><h3>Customers get answers on the spot</h3><p>Prices, hours, onboarding and demo times, at 9 am or 3 am, straight from a fact sheet you approve.</p></div>
+      <div class="card value"><div class="ico b">📋</div><h3>Your lead sheet fills itself</h3><p>One clean row per real person. Repeat messages merged, spam kept out, no copy-pasting.</p></div>
+      <div class="card value"><div class="ico a">✋</div><h3>You only see what needs you</h3><p>Discounts, refunds and custom quotes come to you with a draft ready. The agent never promises them on its own.</p></div>
+    </div>
     <div class="facts">
       <span>Runs entirely in your browser</span>
-      <span>12 stand-in inquiries and a stand-in fact sheet</span>
+      <span>Stand-in inquiries and a stand-in fact sheet</span>
       <span>Built from your post, not from your code</span>
     </div>
     <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
     <div class="jump">
-      <a class="btn" href="#checks">Run your list</a>
-      <a class="btn ghost" href="#app-section">Open the inbox</a>
+      <a class="btn" href="#morning" id="heroplay">▶ Play a morning of inquiries</a>
+      <a class="btn ghost" href="#try">Ask it something yourself</a>
     </div>
   </div>
 </header>
 
 <main class="wrap">
 
+  <section id="morning">
+    <p class="kicker">1 · See it work</p>
+    <h2>A morning of inquiries on your site</h2>
+    <p class="sub">Twelve people write in between 9 and 11 am, through the chat, the contact form and email. Press play. The agent answers what it can, fills your lead sheet, and leaves only the real decisions on your desk.</p>
+    <div class="card sim">
+      <div class="sim-top">
+        <button class="btn" id="play">▶ Play the morning</button>
+        <button class="link" id="skip">Skip to the end</button>
+        <span class="clock" id="clock">08:59</span>
+      </div>
+      <div class="ticker" id="ticker">Your inbox is quiet. Press play.</div>
+      <div class="stats">
+        <div class="stat"><b id="s-in">0</b><span>inquiries in</span></div>
+        <div class="stat good"><b id="s-ans">0</b><span>answered on the spot</span></div>
+        <div class="stat"><b id="s-leads">0</b><span>leads in your sheet</span></div>
+        <div class="stat you"><b id="s-you">0</b><span>waiting for you</span></div>
+        <div class="stat good"><b id="s-bad">0</b><span>promises you didn't approve</span></div>
+      </div>
+      <div class="lanes">
+        <div class="lane ans"><h4>Answered for you <span id="c-ans"></span></h4><p class="hint">Replied in seconds, only from your fact sheet.</p><div id="lane-ans"></div></div>
+        <div class="lane you"><h4>Needs you <span id="c-you"></span></h4><p class="hint">Only you decide these. The customer is told a person will reply today, and your draft is ready.</p><div id="lane-you"></div></div>
+        <div class="lane out"><h4>Handled quietly <span id="c-out"></span></h4><p class="hint">Spam, people who asked to stop, nothing you need to see.</p><div id="lane-out"></div></div>
+      </div>
+      <div class="sheet">
+        <h4>Your lead sheet <small id="sheet-note">Fills in as messages arrive. Keyed by contact, so nothing is saved twice.</small></h4>
+        <table><thead><tr><th>Name</th><th>Came in via</th><th>Asked about</th><th>Budget</th><th>Status</th></tr></thead>
+        <tbody id="sheet"><tr class="empty-row"><td colspan="5">No leads yet.</td></tr></tbody></table>
+      </div>
+      <div class="usual" id="usual">
+        <h4>The same morning through a typical first version</h4>
+        <p style="margin:0 0 8px;font-size:14px;color:var(--ink2)">An agent told to "be helpful", with nothing stopping it, would have:</p>
+        <ul id="usual-list"></ul>
+        <button class="btn ghost small" id="show-bad">See what it would have told your customers</button>
+        <div class="bad-replies" id="bad-replies"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="try">
+    <p class="kicker">2 · Try it yourself</p>
+    <h2>Ask it something, the way your customer would</h2>
+    <p class="sub">Tap a question or type your own. On the left is what your customer sees on your site. On the right is what happens behind the scenes.</p>
+    <div class="card tryit">
+      <div class="site">
+        <div class="site-bar"><i></i><i></i><i></i><span>your website · chat</span></div>
+        <div class="widget">
+          <div class="w-head"><div class="dot">AI</div><div><b>Questions? Ask us</b><small>● Replies in seconds</small></div></div>
+          <div class="w-msgs" id="msgs"><div class="bub bot">Hi! Ask me about our packages, prices, hours or getting started.</div></div>
+          <div class="chips" id="chips"></div>
+          <form class="w-in" id="ask"><input id="own" placeholder="Type a question…" maxlength="200" autocomplete="off"><button class="btn small" type="submit">Send</button></form>
+        </div>
+      </div>
+      <div class="behind">
+        <h4>Behind the scenes</h4>
+        <p class="hint">What the agent checks before anything reaches your customer.</p>
+        <ol class="trace" id="trace"><li class="trace-empty">Ask a question on the left to see each step.</li></ol>
+        <p class="honest">Honest note: replies on this page come from simple rules, so it runs without an AI key. In your build a language model writes them, behind these same checks.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="checks">
-    <p class="kicker">1 · Your list</p>
+    <p class="kicker">3 · Your list</p>
     <h2>The tasks from your post, checked live</h2>
-    <p class="sub">Green is this version. Grey is what the usual first version does with the same 12 inquiries: an agent told to be helpful, with nothing stopping it.</p>
+    <p class="sub">Each task from your post, run on the same 12 inquiries. Green is this version. Grey is what the typical first version does.</p>
     <div class="card checks">
       <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
       <div id="checklist"></div>
     </div>
   </section>
 
-  <section id="app-section">
-    <p class="kicker">2 · The app</p>
-    <h2>The inbox</h2>
-    <p class="sub">Click any inquiry to see what the agent did and why. Switch to the usual version to compare, or type your own customer question.</p>
-    <div class="card">
-      <div class="seg" id="seg"><button class="on" data-side="mine">My version</button><button data-side="usual">The usual version</button></div>
-      <div class="desk"><div id="inbox"></div><div id="detail" class="card"></div></div>
-      <div class="own"><input id="own" placeholder="Type a customer question, e.g. Can I get a refund?" maxlength="200"><button class="btn small" id="try">Ask the agent</button></div>
-    </div>
-  </section>
-
   <section id="plan">
-    <p class="kicker">3 · The real build</p>
-    <h2>How I'd build yours</h2>
+    <p class="kicker">4 · The real build</p>
+    <h2>How this becomes your system in 10 working days</h2>
     <p class="sub">This page is the first slice. Here is how it becomes the automated sales and marketing system in your post.</p>
     <div class="steps">
-      <div class="card step"><div class="n">1</div><h4>Your facts and your rules</h4><p>With you (the director), write down what the agent may say on its own and what always comes to you: prices, discounts, refunds, custom quotes.</p></div>
-      <div class="card step"><div class="n">2</div><h4>Connect your site and tools</h4><p>Your site form and inbox feed in; leads land in your CRM or sheet, keyed so a retry never duplicates; emails go out through your sender with the unsubscribe list respected.</p></div>
-      <div class="card step"><div class="n">3</div><h4>A model behind the rules, measured</h4><p>A language model drafts the replies, only from your facts, and a test set of real inquiries is re-run before every change, so nothing goes live that makes promises.</p></div>
+      <div class="card step"><div class="n">1</div><h4>Days 1–5: the inquiry agent on your site</h4><p>We write your fact sheet together: what it may answer, and what always comes to you. It goes live on your site chat and inbox, with your approval queue.</p></div>
+      <div class="card step"><div class="n">2</div><h4>Days 6–10: leads, uploads and emails</h4><p>Every inquiry saved to your CRM or sheet with no duplicates. Follow-up emails that respect unsubscribes. Then handover and a walkthrough.</p></div>
+      <div class="card step"><div class="n">3</div><h4>After that: it learns from your answers</h4><p>Each question you answer can go into the fact sheet, so your queue shrinks week by week. A test set of real inquiries is re-run before every change.</p></div>
     </div>
   </section>
 
@@ -82,7 +228,7 @@
       <details class="dev" id="dev">
         <summary>For your developer: the run on all 12 inquiries</summary>
         <div class="devbody">
-          <p>The same pipeline, logged. In the real build a model writes the drafts; the dedupe, the do-not-email list and the director routing stay as plain code in front of it, so a model mistake cannot send an unapproved promise.</p>
+          <p>The same pipeline, logged. In the real build a model writes the drafts. The dedupe, the do-not-email list and the approval routing stay as plain code in front of it, so a model mistake cannot send a promise you did not approve.</p>
           <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
         </div>
       </details>
@@ -99,6 +245,6 @@
 
 <script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script src="kit.js?v=e9f4dc36"></script>
-<script src="app.js?v=87b88568"></script>
+<script src="app.js?v=24f322f3"></script>
 </body>
 </html>
