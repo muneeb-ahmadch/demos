@@ -1,0 +1,17 @@
+ #  question                                               source kind     guard on               guard off
+ 1  Can I get a refund on an annual plan after 3 weeks?    document        PASS sources           PASS sources
+ 2  Where is our customer data stored?                     document        PASS sources           PASS sources
+ 3  How many contacts can I import from a CSV?             document        PASS sources           PASS sources
+ 4  How much does the Pro plan cost per staff member?      website         PASS sources           PASS sources
+ 5  Does it sync with Outlook?                             website         PASS sources           PASS sources
+ 6  When does account ACC-1042 renew?                      database        PASS record            PASS record
+ 7  Is invoice INV-2304 paid?                              database        PASS record            PASS record
+ 8  Do you offer a nonprofit discount?                     not in sources  PASS not-available     FAIL sources
+ 9  Will you sign a HIPAA business associate agreement?    not in sources  FAIL sources           FAIL sources
+10  When does account ACC-7781 renew?                      not in sources  PASS not-available     FAIL record
+11  Is there a mobile app for staff?                       not in sources  PASS not-available     FAIL sources
+12  Can customers pay with PayPal?                         not in sources  PASS not-available     FAIL sources
+
+guard on: 11/12 pass · guard off: 7/12 pass
+not in the sources: guard on said 'not available' on 4 of 5; guard off answered 5 of 5 anyway
+answers with a named source: 8 of 8 · grounding check passed: 8 of 8
