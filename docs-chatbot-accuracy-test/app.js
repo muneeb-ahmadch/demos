@@ -46,7 +46,7 @@ function checkFor(req, note, idx) {
 const CHECKS = [
   checkFor('Develop a RAG-based AI chatbot', 'Seven customer questions the stand-in sources do answer: each must come back with the right fact and the source it came from.', [0, 1, 2, 3, 4, 5, 6]),
   checkFor('Connect PDFs, documents, and website content', 'One question per source type at least: two PDFs, two knowledge-base documents, two web pages.', [0, 2, 3, 4, 5, 6]),
-  checkFor('Improve response accuracy and test chatbot performance', 'The accuracy test: all twelve, including five questions the sources cannot answer (a student discount, the FDA, Klarna, a shop to visit, gift cards). The first version scored 6 of 12.', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+  checkFor('Improve response accuracy and test chatbot performance', 'The accuracy test: all twelve, including five questions the sources cannot answer (a student discount, the FDA, Klarna, a shop to visit, gift cards). My first run, with no guard and before the US fix, scored 6 of 12 (in the developer section). The guard-off column here already has the US fix.', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
 ];
 setupChecklist(CHECKS);
 $('#cta').addEventListener('click', () => { track('cta-run'); setTimeout(() => $('#runall').click(), 450); });
