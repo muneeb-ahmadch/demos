@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A website chatbot that answers from your company information</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css?v=e5fc2c33">
+<style>
+  .chat{display:grid;grid-template-columns:1fr 290px}
+  .chat .pane{min-width:0}
+  .ask{display:flex;gap:8px;margin-bottom:14px}
+  .ask input{flex:1;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+  .ask input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--ink2)}
+  .chips button:hover{border-color:var(--accent);color:var(--accent)}
+  .thread{display:flex;flex-direction:column;gap:12px;min-height:180px}
+  .msg{padding:12px 14px;border-radius:12px;font-size:15px;max-width:92%}
+  .msg.you{align-self:flex-end;background:var(--you-soft);color:var(--ink)}
+  .msg.bot{align-self:flex-start;background:var(--soft);border:1px solid var(--line)}
+  .msg.bot.off{background:var(--bad-soft);border-color:#f5c2c2}
+  .route{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+  .route.record{background:var(--you-soft);color:var(--you)}
+  .route.sources{background:var(--ok-soft);color:var(--ok)}
+  .route.not-available{background:var(--warn-soft);color:var(--ben)}
+  .meta{font-size:12px;color:var(--ink3);margin-top:6px}
+  .trace{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink3);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+  .empty{color:var(--ink3);font-size:14px}
+  .legend p{font-size:14px;color:var(--ink2);margin:0 0 12px}
+  .legend .route{margin:0 6px 0 0}
+  .legend ul{margin:0 0 12px;padding-left:18px;font-size:13.5px;color:var(--ink2)}
+  .switch{margin:4px 0 14px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .pair .card{padding:18px}
+  .pair h4{margin:0 0 8px;font-size:15px}
+  .caption{color:var(--ink2);font-size:14px;margin-top:14px}
+  .res .rows{margin-top:6px;font-size:13px;color:var(--ink2)}
+  .res .rows div{padding:3px 0;border-top:1px dashed var(--line)}
+  @media (max-width:900px){.chat,.pair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For your Upwork post · AI chatbot for your Next.js and Node.js website</p>
+    <h1>A chatbot that answers from your company information, and a test that proves it: 12 of 12.</h1>
+    <p class="lede">You wrote <q>Configure the chatbot to answer questions based on our company information.</q> So before sending a proposal, I built that part first: a chatbot on a stand-in company's information and website pages, and a 12-question accuracy test. My first version got 8 of 12 right: it quoted the maintenance plan when asked what a website costs, said "not available" to how long a build takes, and said yes to iPhone apps because a page mentions "mobile-friendly". After five fixes: 12 of 12, every answer naming its source.</p>
+    <div class="facts">
+      <span>Real Python, running in your browser</span>
+      <span>Stand-in company information, no model key needed</span>
+      <span>Built from your post, not from your website</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks" id="cta">Run the 12-question accuracy test</a>
+      <a class="btn ghost" href="#app-section">Ask it yourself</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="checks">
+    <p class="kicker">1 · Your list</p>
+    <h2>The lines from your post, checked live</h2>
+    <p class="sub">Each line from your post runs its customer questions twice: with my "not available" guard on (green), and with the guard switched off, which is what a quick integration usually does: it answers from the closest match it can find.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
+
+  <section id="app-section">
+    <p class="kicker">2 · The chatbot</p>
+    <h2>Ask it something</h2>
+    <p class="sub">Tap a question or type your own. Then switch the guard off and ask again. Under every answer is what happened behind the scenes: where it looked, what it found, and why it answered or didn't.</p>
+    <div class="card chat">
+      <div class="pane">
+        <div class="seg switch" id="mode"><button class="on" data-off="0">Guard on</button><button data-off="1">Guard off (a quick integration)</button></div>
+        <form class="ask" id="askform"><input id="q" placeholder="Ask about prices, build time, maintenance…" autocomplete="off" maxlength="2000"><button class="btn" id="askbtn">Ask</button></form>
+        <div class="chips" id="chips"></div>
+        <div class="thread" id="thread"><p class="empty" id="empty">Answers appear here. The first one loads Python in your browser (about 5 seconds, once).</p></div>
+      </div>
+      <div class="pane legend">
+        <h3>What it knows (stand-in data)</h3>
+        <ul>
+          <li>Company information: company-info.md, maintenance-plans.md</li>
+          <li>Website pages: /services, /pricing, /process</li>
+          <li>A stand-in web and IT services company, not yours</li>
+        </ul>
+        <p><span class="route sources">sources</span>Answered from your company information or a website page, with the source named. Every sentence is checked against that source before it is shown.</p>
+        <p><span class="route not-available">not available</span>Nothing in the sources supports an answer, so it says so and logs the question for your team.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="moment">
+    <p class="kicker">3 · The hard part, slow motion</p>
+    <h2>When the closest match says yes for you</h2>
+    <p class="sub">A visitor asks: <em>"Do you build mobile apps for iPhone?"</em> Nothing in the company information says so. But "mobile" matches "mobile-friendly" on the services page, so retrieval finds a match, and a quick integration answers as if the answer were yes. That is a promise your sales team then has to walk back.</p>
+    <div class="pair">
+      <div class="card"><h4>With the guard</h4><div id="m-on" class="empty">Loading…</div></div>
+      <div class="card"><h4>Without it</h4><div id="m-off" class="empty">Loading…</div></div>
+    </div>
+    <p class="caption">The guard checks three things before anything is shown: the match is strong enough, names in the question (iPhone, Shopify, SEO) appear in the source, and every sentence of the answer is in it. My own first run let "iPhone" through, along with three other misses; that run is in the developer section below, before the fixes.</p>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">4 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the hard part, working. Here is how it becomes your full chatbot.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Your company information in</h4><p>The information you provide plus your website pages, chunked and embedded with the OpenAI API. We write down 30 or so of your customers' real questions, including ones it must answer "not available" (and hand to your team).</p></div>
+      <div class="card step"><div class="n">2</div><h4>Into your Next.js and Node.js site</h4><p>A <code>/api/chat</code> route in your Node.js backend calls OpenAI with the retrieved passages only, behind the same guard, and a clean, responsive chat widget in your Next.js frontend. Your key stays on the server.</p></div>
+      <div class="card step"><div class="n">3</div><h4>Measured, then documented</h4><p>The question set runs before and after every change and you get the count, the way this page shows 8 of 12 becoming 12 of 12. Then a short guide, so your team can update the company information without me.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the 12-question run, my first run with four misses, and the Next.js wiring</summary>
+        <div class="devbody">
+          <p>Opening this runs <code>questions.py</code> in your browser, then replays my recorded first run (before the five fixes). Standard library Python; BM25 retrieval over five sources stands in for embeddings here. The answer writer is extractive (no model key on a public page); in your build the OpenAI writer goes through the same grounding check, in Node.js.</p>
+          <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
+          <pre>def answer(question, settings=None, writer=extractive_writer):
+    # 1. retrieve from company info + website pages (page names indexed, cost = price, "how long" = weeks)
+    # 2. below MIN_SCORE -> "not available"
+    # 3. a name in the question (iPhone, Shopify) missing from the source -> "not available"
+    # 4. writer answers from that source; every sentence must be in it, or "not available"</pre>
+          <pre>// the shape of it in your app (Next.js App Router), sketch
+// app/api/chat/route.ts  -> POST { message }
+//   passages = await retrieve(message)            // your company info, embedded once
+//   if (!passages.length || !namesCovered(message, passages)) return notAvailable()
+//   reply = await openai.chat.completions.create({ model, messages: [system(passages), user(message)] })
+//   return grounded(reply, passages) ? json(reply) : notAvailable()
+// components/ChatWidget.tsx -> the chat bubble, calls /api/chat; no key in the browser</pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured RAG work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">github.com/muneeb-ahmadch/llm-engineering-portfolio</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="kit.js?v=e9f4dc36"></script>
+<script src="app.js?v=af60d13a"></script>
+</body>
+</html>
