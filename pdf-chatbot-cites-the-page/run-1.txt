@@ -1,0 +1,17 @@
+ #  question                                           source              guard on               guard off
+ 1  Can I export my project?                           user-guide.pdf      PASS sources           PASS sources
+ 2  Are attachments included in the export?            user-guide.pdf      PASS sources           PASS sources
+ 3  How much does the Team plan cost per user?         pricing.pdf         PASS sources           PASS sources
+ 4  Can I get a refund on an annual plan?              pricing.pdf         PASS sources           PASS sources
+ 5  Where is our data stored?                          security.pdf        PASS sources           PASS sources
+ 6  Do you support single sign-on?                     security.pdf        PASS sources           PASS sources
+ 7  How long do deleted projects stay in the trash?    support-policy.pdf  PASS sources           PASS sources
+ 8  Is there a mobile app for the dashboard?           not in the PDFs     PASS not-available     FAIL sources
+ 9  Is the Team plan HIPAA compliant?                  not in the PDFs     PASS not-available     FAIL sources
+10  Can I pay for the Team plan with PayPal?           not in the PDFs     PASS not-available     FAIL sources
+11  Is there a nonprofit discount on the Team plan?    not in the PDFs     PASS not-available     FAIL sources
+12  Can I export my project to Excel or PDF?           not in the PDFs     PASS not-available     FAIL sources
+
+guard on: 12/12 pass · guard off: 7/12 pass
+not in the PDFs: guard on said 'not available' on 5 of 5; guard off answered 5 of 5 anyway
+answers with a named source: 7 of 7 · grounding check passed: 7 of 7

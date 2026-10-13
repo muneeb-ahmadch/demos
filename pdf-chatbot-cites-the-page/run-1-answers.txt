@@ -1,0 +1,24 @@
+Can I export my project? | sources ['user-guide.pdf, p. 2'] 4.152238927530552 | To export a project, open Settings and choose Export. Exports are CSV files and include ta
+   OFF: ['user-guide.pdf, p. 2'] To export a project, open Settings and choose Export. Exports are CSV files and include tasks, comme
+Are attachments included in the export? | sources ['user-guide.pdf, p. 2'] 6.816452954341416 | To export a project, open Settings and choose Export. Attachments are not included in the 
+   OFF: ['user-guide.pdf, p. 2'] To export a project, open Settings and choose Export. Attachments are not included in the export.
+How much does the Team plan cost per user? | sources ['pricing.pdf, p. 1'] 11.506125631121096 | The Team plan costs 12 euros per user per month, billed annually. Monthly billing on the T
+   OFF: ['pricing.pdf, p. 1'] The Team plan costs 12 euros per user per month, billed annually. Monthly billing on the Team plan c
+Can I get a refund on an annual plan? | sources ['pricing.pdf, p. 2'] 2.4963836670371933 | Annual plans are refunded pro rata within the first 30 days only.
+   OFF: ['pricing.pdf, p. 2'] Annual plans are refunded pro rata within the first 30 days only.
+Where is our data stored? | sources ['security.pdf, p. 1'] 4.844424885015114 | All data is stored in data centres in the European Union. Data is encrypted at rest with A
+   OFF: ['security.pdf, p. 1'] All data is stored in data centres in the European Union. Data is encrypted at rest with AES-256 and
+Do you support single sign-on? | sources ['security.pdf, p. 2'] 4.027158220882461 | Single sign-on with SAML is available on the Enterprise plan.
+   OFF: ['security.pdf, p. 2'] Single sign-on with SAML is available on the Enterprise plan.
+How long do deleted projects stay in the trash? | sources ['support-policy.pdf, p. 2'] 9.563261505425569 | Deleted projects stay in the trash for 30 days and can be restored by an admin. After 30 d
+   OFF: ['support-policy.pdf, p. 2'] Deleted projects stay in the trash for 30 days and can be restored by an admin. After 30 days they a
+Do you have a mobile app? | not-available [] 0.0 | That isn't in the documents, so I won't guess.
+   OFF: ['user-guide.pdf, p. 1'] To create a project, open the dashboard and press New project.
+Is the product HIPAA compliant? | not-available [] 0.0 | That isn't in the documents, so I won't guess.
+   OFF: ['user-guide.pdf, p. 1'] To create a project, open the dashboard and press New project.
+Can I pay with PayPal? | not-available [] 0.0 | That isn't in the documents, so I won't guess.
+   OFF: ['user-guide.pdf, p. 1'] To create a project, open the dashboard and press New project.
+Do you offer a discount for nonprofits? | not-available [] 0.0 | That isn't in the documents, so I won't guess.
+   OFF: ['user-guide.pdf, p. 1'] To create a project, open the dashboard and press New project.
+Is there an API I can connect to? | not-available [] 0.0 | That isn't in the documents, so I won't guess.
+   OFF: ['user-guide.pdf, p. 1'] To create a project, open the dashboard and press New project.
