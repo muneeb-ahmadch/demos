@@ -1,0 +1,17 @@
+ #  question                                       source kind          guard on               guard off
+ 1  How much does a business website cost?         website              PASS sources           PASS sources
+ 2  How long does a website take to build?         website              PASS sources           PASS sources
+ 3  Do you build online stores?                    website              PASS sources           PASS sources
+ 4  What does the Pro maintenance plan include?    company info         PASS sources           PASS sources
+ 5  Can I cancel my maintenance plan?              company info         PASS sources           PASS sources
+ 6  What are your office hours?                    company info         PASS sources           PASS sources
+ 7  Can you move my old website to Next.js?        website              PASS sources           PASS sources
+ 8  Do you build mobile apps for iPhone?           not in company info  PASS not-available     FAIL sources
+ 9  Do you work with Shopify?                      not in company info  PASS not-available     FAIL sources
+10  Do you offer a discount for nonprofits?        not in company info  PASS not-available     FAIL sources
+11  Can I pay in monthly installments?             not in company info  PASS not-available     FAIL sources
+12  Do you offer SEO services?                     not in company info  PASS not-available     FAIL sources
+
+guard on: 12/12 pass · guard off: 7/12 pass
+not in the company info: guard on said 'not available' on 5 of 5; guard off answered 5 of 5 anyway
+answers with a named source: 7 of 7 · grounding check passed: 7 of 7
