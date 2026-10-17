@@ -1,0 +1,17 @@
+ #  customer message                                     kind                   guard on            guard off
+ 1  How do I reset my smart plug?                        product doc            PASS sources        PASS sources
+ 2  Does it work with Alexa?                             product doc            PASS sources        PASS sources
+ 3  How long does delivery take?                         FAQ                    PASS sources        PASS sources
+ 4  Can I return it if I don't like it?                  FAQ                    PASS sources        PASS sources
+ 5  When will I get my refund?                           FAQ                    FAIL not-sure       PASS sources
+ 6  My plug won't connect to my 5 GHz wifi               help article           PASS sources        PASS sources
+ 7  How do I claim the warranty?                         help article           PASS sources        PASS sources
+ 8  Does the plug work with Apple HomeKit?               not in knowledge base  PASS not-sure       FAIL sources
+ 9  Do you ship to Canada?                               not in knowledge base  PASS not-sure       FAIL sources
+10  Is there a discount code for first orders?           not in knowledge base  PASS not-sure       FAIL sources
+11  Can I talk to a real person please?                  asks for a human       PASS handoff        FAIL sources
+12  This is ridiculous, my plug stopped working again!!  frustrated             PASS handoff        FAIL sources
+
+guard on: 11/12 pass · guard off: 7/12 pass
+not in the knowledge base: 'I'm not sure' + handoff on 3 of 3 · human/frustrated: handed off 2 of 2
+answers with a named source: 6 of 6 · grounding check passed: 6 of 6
