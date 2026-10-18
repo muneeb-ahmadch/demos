@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Your memory system's scorer, audited with canaries</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css?v=e5fc2c33">
+<style>
+  .tryrow{display:grid;gap:8px}.tryrow select,.tryrow input{font:inherit;padding:10px;border:1px solid #d8d4cc;border-radius:8px;width:100%;box-sizing:border-box}
+.tryout{margin-top:14px;display:grid;gap:8px}.tryout div{padding:10px 12px;border-radius:8px;background:#f4f1ea}.tryout .good{background:#e7f4ea}.tryout .bad{background:#fbe9e7}
+.records{margin-top:14px}.records table{border-collapse:collapse;width:100%;font-size:14px}.records td,.records th{border-bottom:1px solid #e6e2da;padding:6px;text-align:left}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For your Upwork post · AI memory system test harness audit</p>
+    <h1>Does your scorer fail the answers it should? Here is the first canary run.</h1>
+    <p class="lede">You wrote <q>Report every case where it passes something it should fail.</q> So before sending a proposal, I wrote a small canary set in your three answer types (current value, value as of a date, no match) and ran it against a typical first scorer and a stricter one. Press Run all.</p>
+    <div class="facts">
+      <span>Runs entirely in your browser</span>
+      <span>Sample records, invented company</span>
+      <span>Built from your post, not from your code</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built this for your post before applying</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks">Run the canaries</a>
+      <a class="btn ghost" href="#app-section">Score your own answer</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="checks">
+    <p class="kicker">1 · Your list</p>
+    <h2>Your canary types, run live</h2>
+    <p class="sub">Each canary is a deliberately wrong answer (the scorer must fail it) or a right answer in an awkward format (the scorer must pass it). Green is the stricter scorer; grey is what a typical first scorer did.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
+
+  <section id="app-section">
+    <p class="kicker">2 · The app</p>
+    <h2>Score an answer yourself</h2>
+    <p class="sub">Pick a question about the sample records, type any answer, and see how each scorer grades it. Try hedging, guessing after "no match", or the old value.</p>
+    <div class="card">
+      <div class="tryrow">
+        <label for="qsel">Question</label>
+        <select id="qsel"></select>
+        <label for="ans">Answer to score</label>
+        <input id="ans" type="text" autocomplete="off">
+        <button class="btn small" id="scorebtn">Score it</button>
+      </div>
+      <div id="tryout" class="tryout"></div>
+      <details class="records"><summary>The sample records</summary><div id="recs"></div></details>
+    </div>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">4 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the first slice. Here is how it becomes your three milestones.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Scorer audit (40%)</h4><p>Read your scoring code and answer keys, run canaries like these against it (wrong answers, near-misses, formatting and Unicode tricks, blank or malformed keys), and report every case where it passes something it should fail, each with the failing input.</p></div>
+      <div class="card step"><div class="n">2</div><h4>Blind test set (40%)</h4><p>Write 20 synthetic business records and about 30 questions with a frozen answer key: current values, superseded values, "as of" dates and no-answer questions. Delivered to you only, never to the developer.</p></div>
+      <div class="card step"><div class="n">3</div><h4>Answer-filter review and call (20%)</h4><p>Review the code that decides which facts answer a question, list false matches, missed matches and fragile word matching, and walk you through it on a one-hour Upwork call.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the canary run and both scorers</summary>
+        <div class="devbody">
+          <p>The same canaries, run through both scorers in your browser. The typical scorer lowercases, strips punctuation and checks the key is a substring of the answer. The stricter one normalises Unicode (NFKC), parses amounts and dates as typed values, requires exactly one value, rejects hedges and superseded values, and treats a blank key as an error. It was written against these canaries, so its clean score is not a claim about anything else; the point is the typical scorer's misses.</p>
+          <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured engineering work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/09-answer-defense">my public RAG evaluation work</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="kit.js?v=e9f4dc36"></script>
+<script src="scorers.js?v=15bf041f"></script>
+<script src="app.js?v=1cb1e149"></script>
+</body>
+</html>
