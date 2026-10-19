@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A chatbot on your documents, tested for accuracy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css?v=e5fc2c33">
+<style>
+  .chat{display:grid;grid-template-columns:1fr 290px}
+  .chat .pane{min-width:0}
+  .ask{display:flex;gap:8px;margin-bottom:14px}
+  .ask input{flex:1;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+  .ask input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--ink2)}
+  .chips button:hover{border-color:var(--accent);color:var(--accent)}
+  .thread{display:flex;flex-direction:column;gap:12px;min-height:180px}
+  .msg{padding:12px 14px;border-radius:12px;font-size:15px;max-width:92%}
+  .msg.you{align-self:flex-end;background:var(--you-soft);color:var(--ink)}
+  .msg.bot{align-self:flex-start;background:var(--soft);border:1px solid var(--line)}
+  .msg.bot.off{background:var(--bad-soft);border-color:#f5c2c2}
+  .route{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+  .route.record{background:var(--you-soft);color:var(--you)}
+  .route.sources{background:var(--ok-soft);color:var(--ok)}
+  .route.not-available{background:var(--warn-soft);color:var(--ben)}
+  .meta{font-size:12px;color:var(--ink3);margin-top:6px}
+  .trace{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink3);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+  .empty{color:var(--ink3);font-size:14px}
+  .legend p{font-size:14px;color:var(--ink2);margin:0 0 12px}
+  .legend .route{margin:0 6px 0 0}
+  .legend ul{margin:0 0 12px;padding-left:18px;font-size:13.5px;color:var(--ink2)}
+  .switch{margin:4px 0 14px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .pair .card{padding:18px}
+  .pair h4{margin:0 0 8px;font-size:15px}
+  .caption{color:var(--ink2);font-size:14px;margin-top:14px}
+  .res .rows{margin-top:6px;font-size:13px;color:var(--ink2)}
+  .res .rows div{padding:3px 0;border-top:1px dashed var(--line)}
+  @media (max-width:900px){.chat,.pair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow"><!--SLOT:EYEBROW-->For your Upwork post · the AI layer of your SaaS product<!--/SLOT--></p>
+    <h1>A chatbot that answers from your documents, and a test that proves it: 12 of 12.</h1>
+    <p class="lede"><!--SLOT:THEIR-LINE-->You wrote <q>We want AI that works in production, not a demo. That means good retrieval quality</q> and <q>fallbacks when the model gets it wrong.</q> Here is that part, already working on stand-in data. <!--/SLOT-->A small chatbot on stand-in PDFs, documents and web pages, and a 12-question accuracy test. The usual first version got 6 of 12 right. It answered all five questions the sources can't answer, and it told a customer asking how long US shipping takes that shipping is free. After two fixes: 12 of 12, every answer naming its source.</p>
+    <div class="facts">
+      <span>Real Python, running in your browser</span>
+      <span>Stand-in shop content, no model key needed</span>
+      <span>Nothing of yours was touched</span>
+    </div>
+    <div class="from"><div class="avatar">MA</div><div><strong style="color:var(--ink)">Muneeb</strong> · built and tested this myself</div></div>
+    <div class="jump">
+      <a class="btn" href="#checks" id="cta">Run the 12-question accuracy test</a>
+      <a class="btn ghost" href="#app-section">Ask it yourself</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="checks">
+    <p class="kicker">1 · The checks</p>
+    <h2>What it has to get right, checked live</h2>
+    <p class="sub">Each check runs its customer questions twice: with my "not available" guard on (green), and with the guard switched off, which is what a first version usually does: it answers from the closest match it can find.</p>
+    <div class="card checks">
+      <div class="checks-head"><span class="score" id="score"></span><button class="btn small" id="runall">Run all</button></div>
+      <div id="checklist"></div>
+    </div>
+  </section>
+
+  <section id="app-section">
+    <p class="kicker">2 · The chatbot</p>
+    <h2>Ask it something</h2>
+    <p class="sub">Tap a question or type your own. Then switch the guard off and ask again. Under every answer is what happened behind the scenes: where it looked, what it found, and why it answered or didn't.</p>
+    <div class="card chat">
+      <div class="pane">
+        <div class="seg switch" id="mode"><button class="on" data-off="0">Guard on</button><button data-off="1">Guard off (usual first version)</button></div>
+        <form class="ask" id="askform"><input id="q" placeholder="Ask about returns, shipping, wholesale…" autocomplete="off" maxlength="2000"><button class="btn" id="askbtn">Ask</button></form>
+        <div class="chips" id="chips"></div>
+        <div class="thread" id="thread"><p class="empty" id="empty">Answers appear here. The first one loads Python in your browser (about 5 seconds, once).</p></div>
+      </div>
+      <div class="pane legend">
+        <h3>What it knows (stand-in data)</h3>
+        <ul>
+          <li>PDFs: returns-policy.pdf, ingredient-guide.pdf</li>
+          <li>Documents: shipping-faq.docx, wholesale-terms.docx</li>
+          <li>Website: /shipping, /about, /products/vitamin-c-serum</li>
+        </ul>
+        <p><span class="route sources">sources</span>Answered from a PDF, document or web page, with the source named. Every sentence is checked against that source before it is shown.</p>
+        <p><span class="route not-available">not available</span>Nothing in the sources supports an answer, so it says so and logs the question for your team.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="moment">
+    <p class="kicker">3 · The hard part, slow motion</p>
+    <h2>When the closest match is the wrong answer</h2>
+    <p class="sub">A customer asks: <em>"Is the serum approved by the FDA?"</em> Nothing in the sources mentions the FDA. But "serum" matches the product page, so retrieval still finds a match, and a first version answers with whatever that page says.</p>
+    <div class="pair">
+      <div class="card"><h4>With the guard</h4><div id="m-on" class="empty">Loading…</div></div>
+      <div class="card"><h4>Without it</h4><div id="m-off" class="empty">Loading…</div></div>
+    </div>
+    <p class="caption">The guard checks three things before anything is shown: the match is strong enough, names in the question (FDA, Klarna) appear in the source, and every sentence of the answer is in it. The test also caught a miss in my own first run: "US" was being thrown away as the word "us", so a US shipping question got the free-shipping line. That run is in the developer section below, before the fix.</p>
+  </section>
+
+  <section id="plan">
+    <p class="kicker">4 · The real build</p>
+    <h2>How I'd build yours</h2>
+    <p class="sub">This page is the hard part, working. Here is how it becomes your full chatbot.</p>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h4>Your PDFs, documents and website in</h4><p>Python and LangChain: ingestion and chunking for your files and pages, embeddings in a vector database (Chroma, pgvector or Pinecone). We write down 30 or so of your customers' real questions, including ones it must answer "not available".</p></div>
+      <div class="card step"><div class="n">2</div><h4>The LLM behind the guard</h4><p>OpenAI or Claude writes each answer from the retrieved passages only and names them. The guard you see here stays in code and checks every answer.</p></div>
+      <div class="card step"><div class="n">3</div><h4>Measured, then documented</h4><p>The question set runs before and after every change and you get the count, the way this page shows 6 of 12 becoming 12 of 12. Then the basic setup documentation, so you can add documents yourself.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <details class="dev" id="dev">
+        <summary>For your developer: the 12-question run, the first run with the US miss, and the guard</summary>
+        <div class="devbody">
+          <p>Opening this runs <code>questions.py</code> in your browser, then replays the recorded first run (before the US / "how long" fix). Standard library Python; BM25 retrieval over seven sources stands in for embeddings here. The answer writer is extractive (no model key on a public page); in the real build the LLM writer goes through the same grounding check.</p>
+          <pre id="devout"><span class="dim">Opening this section runs it…</span></pre>
+          <pre>def answer(question, settings=None, writer=extractive_writer):
+    # 1. retrieve from PDFs + documents + website pages ("US" kept as a place, "how long" -> days)
+    # 2. below MIN_SCORE -> "not available"
+    # 3. a name or acronym in the question missing from the source -> "not available"
+    # 4. writer answers from that source; every sentence must be in it, or "not available"</pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="card"><div class="avatar">MA</div><div>Happy to walk you through it in Upwork Messages or on an Upwork call. More of my measured RAG work is public at <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">github.com/muneeb-ahmadch/llm-engineering-portfolio</a>.</div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script data-goatcounter="https://mademos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script src="kit.js?v=e9f4dc36"></script>
+<script src="app.js?v=4832594f"></script>
+</body>
+</html>
