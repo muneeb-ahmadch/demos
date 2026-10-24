@@ -1,0 +1,156 @@
+{
+  "project": "Relay Support Operations",
+  "scope": "Original portfolio project using synthetic business data. Public walkthrough simulates AI and deliveries.",
+  "recorded_at_utc": "2026-10-24T20:06:00.348289+00:00",
+  "reliability_tests": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "n8n": {
+    "runtime": {
+      "n8n": "2.44.6",
+      "node": "v24.22.1"
+    },
+    "tested": [
+      "all three production workflow JSON imports",
+      "n8n HTTP Header Auth credential resolution",
+      "knowledge HTTP Request",
+      "intake HTTP Request",
+      "worker HTTP Request",
+      "published knowledge and intake Webhook Header Auth",
+      "Respond to Webhook status/JSON passthrough",
+      "duplicate intake via real webhook",
+      "422 validation response via real webhook",
+      "actual wall-clock Schedule Trigger"
+    ],
+    "observations": {
+      "unauthenticated_intake": {
+        "status": 403,
+        "body": "Authorization data is wrong!"
+      },
+      "knowledge": {
+        "status": 200,
+        "body": {
+          "source_id": "n8n-published-policy",
+          "version": "cd97e98c594509cc055309137bce472fd2eddba8d11a28f6e01210e44db71c6f",
+          "changed": true
+        }
+      },
+      "intake": {
+        "status": 202,
+        "body": {
+          "id": "adc9e3fba2dc41ff",
+          "status": "queued",
+          "duplicate": false
+        }
+      },
+      "duplicate": {
+        "status": 202,
+        "body": {
+          "id": "adc9e3fba2dc41ff",
+          "status": "queued",
+          "duplicate": true
+        }
+      },
+      "invalid_payload_status": 422,
+      "schedule_executions": [
+        {
+          "id": 8,
+          "mode": "trigger",
+          "status": "success"
+        }
+      ],
+      "scheduled_ticket_status": "awaiting_review",
+      "test_only_retention_override": "saveDataSuccessExecution=all in the isolated bound copies; production graph unchanged"
+    },
+    "not_tested": [
+      "Docker Compose",
+      "live provider integrations"
+    ]
+  },
+  "model_checks": {
+    "rag-anthropic-rerun.json": {
+      "anthropic": {
+        "model": "claude-sonnet-4-6",
+        "dataset": {
+          "path": "eval/cases.json",
+          "kind": "fixed synthetic held-out acceptance cases",
+          "cases": 16,
+          "supported": 8,
+          "expected_holds": 8,
+          "note": "Authored separately from application implementation; no cases removed or expectations changed after observing scores. Small synthetic dataset; no claim of client-data accuracy or calibrated confidence."
+        },
+        "metrics": {
+          "answerability_correct": 16,
+          "answerability_total": 16,
+          "answerability_accuracy": 1.0,
+          "case_passes": 16,
+          "false_answer_count": 0,
+          "false_answer_cases": [],
+          "false_abstain_count": 0,
+          "false_abstain_cases": [],
+          "citation_integrity_failures": [],
+          "required_source_failures": [],
+          "generation_exceptions": 0,
+          "answerable_outputs": 8,
+          "validated_citation_count": 9,
+          "model_http_requests": 11,
+          "total_latency_seconds": 42.655
+        }
+      }
+    },
+    "rag-anthropic-holdout.json": {
+      "anthropic": {
+        "model": "claude-sonnet-4-6",
+        "dataset": {
+          "path": "eval/coverage-holdout.json",
+          "kind": "fixed synthetic held-out acceptance cases",
+          "cases": 8,
+          "supported": 4,
+          "expected_holds": 4,
+          "note": "Authored separately from application implementation; no cases removed or expectations changed after observing scores. Small synthetic dataset; no claim of client-data accuracy or calibrated confidence."
+        },
+        "metrics": {
+          "answerability_correct": 8,
+          "answerability_total": 8,
+          "answerability_accuracy": 1.0,
+          "case_passes": 8,
+          "false_answer_count": 0,
+          "false_answer_cases": [],
+          "false_abstain_count": 0,
+          "false_abstain_cases": [],
+          "citation_integrity_failures": [],
+          "required_source_failures": [],
+          "generation_exceptions": 0,
+          "answerable_outputs": 4,
+          "validated_citation_count": 4,
+          "model_http_requests": 7,
+          "total_latency_seconds": 27.726
+        }
+      }
+    }
+  },
+  "application_flow": {
+    "model": "claude-sonnet-4-6",
+    "actual_provider_draft": true,
+    "approved_by_person": true,
+    "completed_local_receipts": 2,
+    "receipt_mode": "demo",
+    "customer_reply_sent": false
+  },
+  "separate_mcp_sandbox_check": {
+    "hubspot_contact_readback": true,
+    "slack_message_readback": true,
+    "scope": "Separate approved test-workspace writes; not proof of unattended runtime delivery."
+  },
+  "limitations": [
+    "Small synthetic acceptance sets, not a production accuracy claim.",
+    "Earlier timeouts and failed model retries remain in the project evidence.",
+    "Unattended live client-account runtime integration remains pending.",
+    "HubSpot action supports email-based contact identity, not deal/owner/lifecycle changes.",
+    "No customer email is sent.",
+    "Public page makes no live AI calls or platform writes."
+  ]
+}

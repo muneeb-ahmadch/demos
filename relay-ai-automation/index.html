@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Relay — AI support automation | Muneeb Ahmad</title>
+  <meta name="description" content="Explore an n8n and Claude support workflow: approved company knowledge, a sourced draft, human approval, and tracked HubSpot and Slack handoffs.">
+  <meta name="theme-color" content="#39233e">
+  <meta property="og:title" content="Relay — AI support automation">
+  <meta property="og:description" content="From customer question to reviewed action. n8n, Claude, HubSpot and Slack, with evidence and delivery recovery.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://muneeb-ahmadch.github.io/demos/relay-ai-automation/">
+  <meta property="og:image" content="https://muneeb-ahmadch.github.io/demos/relay-ai-automation/assets/cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23ff7953'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Arial' font-weight='700' font-size='23' fill='%2339233e'%3ER%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#walkthrough">Skip to interactive walkthrough</a>
+  <header class="site-header wrap">
+    <a class="brand" href="https://muneeb-ahmadch.github.io/#demos"><span class="brand-mark" aria-hidden="true">R<span></span></span>relay<span class="brand-dot">.</span><span class="byline">by Muneeb Ahmad</span></a>
+    <a class="header-link" href="https://muneeb-ahmadch.github.io/#demos">All demos <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <section class="hero wrap" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span>AI AUTOMATION · SUPPORT OPERATIONS</p>
+        <h1 id="page-title">A customer question.<br><em>An approved next step.</em></h1>
+        <p class="hero-description">Company knowledge becomes a sourced AI draft. Your team reviews it. The approved handoff reaches your CRM and team chat.</p>
+        <div class="hero-actions"><a class="button primary" href="#walkthrough">Try the workflow <span aria-hidden="true">↓</span></a><a class="text-link" href="https://www.upwork.com/freelancers/~016a7a38429f479374" target="_blank" rel="noopener">Build a workflow like this <span aria-hidden="true">↗</span></a></div>
+        <p class="hero-caption">Original portfolio project. Synthetic business data.</p>
+      </div>
+      <div class="workflow-map" aria-label="The workflow: n8n receives the request, Claude selects approved knowledge, a person reviews the draft, then HubSpot and Slack receive the approved handoff.">
+        <div class="map-heading"><span>THE WORKFLOW</span><span class="map-id">01 → 04</span></div>
+        <div class="map-row"><span class="map-icon orange" aria-hidden="true">↳</span><div><strong>A request comes in</strong><span>n8n · authenticated intake</span></div><span class="map-number">01</span></div>
+        <div class="map-row"><span class="map-icon cream" aria-hidden="true">✳</span><div><strong>AI finds the supporting policy</strong><span>Claude + RAG · approved documents</span></div><span class="map-number">02</span></div>
+        <div class="map-row human"><span class="map-icon coral" aria-hidden="true">✓</span><div><strong>A person owns the decision</strong><span>Review the draft, evidence and actions</span></div><span class="map-number">03</span></div>
+        <div class="map-row"><span class="map-icon mint" aria-hidden="true">↗</span><div><strong>The approved handoff moves</strong><span>HubSpot contact identity + Slack</span></div><span class="map-number">04</span></div>
+        <div class="map-foot"><span aria-hidden="true">◈</span> Every action has a review and a delivery record.</div>
+      </div>
+    </section>
+
+    <div class="platform-strip wrap" aria-label="Platforms and responsibilities">
+      <span>BUILT AROUND YOUR TOOLS</span><div><b class="n8n">n8n</b><small>Orchestration</small></div><span class="plus" aria-hidden="true">+</span><div><b class="claude">Claude</b><small>Evidence selection</small></div><span class="plus" aria-hidden="true">+</span><div><b class="hubspot">HubSpot</b><small>Contact identity</small></div><span class="plus" aria-hidden="true">+</span><div><b class="slack">Slack</b><small>Team handoff</small></div>
+    </div>
+
+    <section class="walkthrough-section wrap" id="walkthrough" aria-labelledby="walkthrough-title">
+      <div class="section-heading"><div><p class="eyebrow">TAKE THE REVIEWER’S SEAT</p><h2 id="walkthrough-title">Follow one request all the way through.</h2></div><p>Choose a scenario.<br> See the answer, the decision and the outcome.</p></div>
+      <p class="simulation-notice"><span aria-hidden="true">◈</span><span><strong>Interactive walkthrough.</strong> Synthetic examples and simulated deliveries. No live AI calls or HubSpot / Slack writes.</span></p>
+      <div class="scenario-tabs" role="group" aria-label="Choose a scenario">
+        <button class="scenario selected" data-scenario="supported" aria-pressed="true"><span>01</span><div><strong>A supported question</strong><small>Knowledge → approval → handoff</small></div></button>
+        <button class="scenario" data-scenario="missing" aria-pressed="false"><span>02</span><div><strong>The answer is missing</strong><small>Hold the request for a person</small></div></button>
+        <button class="scenario" data-scenario="recovery" aria-pressed="false"><span>03</span><div><strong>A delivery fails</strong><small>Recover the failed action</small></div></button>
+      </div>
+      <div class="demo-console">
+        <div class="console-header"><span><span class="console-dot" aria-hidden="true"></span>RELAY / REVIEW DESK</span><span class="console-mode">Browser walkthrough</span></div>
+        <ol class="progress" aria-label="Request progress" id="progress"></ol>
+        <div class="demo-grid">
+          <div class="request-column">
+            <div class="request-top"><span class="avatar" aria-hidden="true" id="avatar">AM</span><div><strong id="customer">Alex Morgan</strong><span>Synthetic customer request</span></div><span class="badge" id="case-status">Ready for review</span></div>
+            <h3 id="subject">Download a paid invoice</h3>
+            <p class="field-label">CUSTOMER QUESTION</p><div class="question" id="question"></div>
+            <div class="draft-heading"><p class="field-label">PROPOSED REPLY</p><span class="recorded-label" id="draft-label">Recorded Claude example</span></div>
+            <div class="draft" id="draft"></div>
+            <details class="source" id="source-details"><summary><span><span aria-hidden="true">▧</span> Inspect the supporting evidence</span><span aria-hidden="true">+</span></summary><div class="source-body" id="source-body"></div></details>
+            <div class="why" id="why"></div>
+          </div>
+          <div class="decision-column">
+            <div class="decision-heading"><span class="field-label">THE NEXT STEP</span><span class="decision-symbol" aria-hidden="true">↗</span></div>
+            <h3 id="decision-title">You review. Then the tools act.</h3>
+            <p class="decision-description" id="decision-description"></p>
+            <div class="action-list" id="action-list"></div>
+            <div class="delivery-results" id="delivery-results" hidden></div>
+            <div class="decision-controls"><button class="button primary" id="advance">Approve demo handoff <span aria-hidden="true">→</span></button><button class="reset-button" id="reset">Reset this example</button></div>
+            <p class="action-note" id="action-note">Approval covers only the two actions shown. The customer reply remains a draft.</p>
+          </div>
+        </div>
+        <div class="console-bottom"><span class="mono" id="example-id">DEMO / RELAY-001</span><p id="event-status" role="status" aria-live="polite">A sourced draft is waiting for a person to review.</p></div>
+      </div>
+      <div class="takeaway" id="takeaway"><span>WHAT THIS MEANS FOR YOUR TEAM</span><p>One place to check the answer and authorise the next step.</p></div>
+      <noscript><p class="noscript">Enable JavaScript to change scenarios. This page is a browser simulation; the application screenshots and verification notes below remain available.</p></noscript>
+    </section>
+
+    <section class="real-section" aria-labelledby="real-title"><div class="wrap real-grid">
+      <div><p class="eyebrow">THE APPLICATION BEHIND THE WALKTHROUGH</p><h2 id="real-title">A working review desk.<br><em>A traceable workflow.</em></h2><p>The browser tour illustrates the decisions. The underlying application stores requests, retrieves versioned evidence, holds actions for approval and records each delivery attempt.</p><ul class="real-list"><li>n8n intake and scheduled worker workflows</li><li>Claude selects evidence; code assembles exact excerpts</li><li>A review console with approval and activity history</li><li>Delivery retries, duplicate handling and setup documentation</li></ul><a class="text-link" href="#verification">Inspect the implementation evidence <span aria-hidden="true">↓</span></a></div>
+      <figure class="app-shot"><a href="assets/console.png" target="_blank" rel="noopener" aria-label="Open full application screenshot"><img src="assets/console.png" alt="Actual Relay review console with synthetic requests, a completed invoice question, and the n8n, evidence, review and delivery workflow" width="1512" height="982" loading="lazy"></a><figcaption>Actual application screenshot · Synthetic requests · Local sandbox receipts. Select to enlarge.</figcaption></figure>
+    </div></section>
+
+    <section class="verification wrap" id="verification" aria-labelledby="verification-title">
+      <div class="section-heading"><div><p class="eyebrow">PROOF YOU CAN INSPECT</p><h2 id="verification-title">The checks come with the build.</h2></div><p>Recorded results, with their scope.<br> The tests behind the workflow.</p></div>
+      <div class="proof-grid">
+        <article><span class="proof-number">76</span><h3>Reliability tests</h3><p>Recorded automated checks cover approval, state changes, duplicate requests and delivery behaviour.</p></article>
+        <article><span class="proof-number">16 + 8</span><h3>Claude acceptance cases</h3><p>A 16-case synthetic rerun and a separate eight-case set passed with Sonnet 4.6. These are small, task-specific checks.</p></article>
+        <article><span class="proof-word">n8n</span><h3>Actual workflow execution</h3><p>Native import, authenticated published webhooks, duplicate intake and a real scheduled execution were exercised.</p></article>
+      </div>
+      <details class="technical"><summary>Implementation, evidence and integration scope <span aria-hidden="true">+</span></summary><div class="technical-body"><div><h3>What has been verified</h3><p>The application completed an actual Anthropic draft through human approval and two local sandbox receipts. Separate approved HubSpot and Slack test-workspace actions were verified through MCP read-back.</p><p>The current browser walkthrough is simulated. Unattended runtime delivery into client accounts remains pending. HubSpot’s implemented action is email-based contact identity; it does not change deals, owners or lifecycle stages. No customer email is sent.</p><p>Earlier model timeouts and failed retries remain in the source evidence. This is an independent portfolio project, using synthetic policies and requests.</p></div><div><h3>Inspect the artifacts</h3><a class="download" href="downloads/01-support-intake.json" download>n8n support intake <span>JSON ↓</span></a><a class="download" href="downloads/02-queue-worker.json" download>n8n scheduled worker <span>JSON ↓</span></a><a class="download" href="downloads/03-knowledge-intake.json" download>n8n knowledge intake <span>JSON ↓</span></a><a class="download" href="downloads/verification.json" download>Recorded verification summary <span>JSON ↓</span></a><p class="download-note">Workflow exports require your own Relay service and credentials. They contain no configured secrets.</p></div></div></details>
+      <details class="demand"><summary>Why I built this workflow <span aria-hidden="true">+</span></summary><p>I designed Relay around recurring requirements in captured automation briefs: answers grounded in company documents, approval queues, CRM and team handoffs, visible failures and exportable n8n workflows. It connects my RAG work to an operational task a team can review and control.</p><p>The research used a selected September–October 2026 job sample. It informed the design; it does not establish market share, client savings or a production success rate.</p></details>
+    </section>
+
+    <section class="hire-section wrap" aria-labelledby="hire-title"><div><p class="eyebrow">YOUR PROCESS. YOUR KNOWLEDGE. YOUR TOOLS.</p><h2 id="hire-title">Have a workflow like this?</h2><p>Send me the request you receive, the knowledge it should use, and the tools it needs to update. We can scope one workflow with clear review and failure behaviour.</p></div><a class="button light" href="https://www.upwork.com/freelancers/~016a7a38429f479374" target="_blank" rel="noopener">Discuss it on Upwork <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="wrap"><a href="https://muneeb-ahmadch.github.io/#demos">Muneeb Ahmad · AI engineer</a><span>Relay · AI support automation</span><a href="#page-title">Back to top ↑</a></footer>
+</body>
+</html>

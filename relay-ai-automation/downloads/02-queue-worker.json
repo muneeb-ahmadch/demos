@@ -1,0 +1,115 @@
+{
+  "name": "Relay | Queue worker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "f7c52759-0a55-5375-86c5-c6b5f4c88b2e",
+      "name": "Every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "9bed776e-d4e2-592b-b020-5a435ce0f8a7",
+      "name": "Run manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.AUTOMATION_API_URL || 'http://127.0.0.1:8765').replace(/\\/$/, '') + '/api/worker/tick' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\":1}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "3d037e2c-083e-53ec-887f-9ebd9f326a8f",
+      "name": "Process queued work",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "content": "## Relay \u00b7 Queue worker\nProcesses up to 1 queued tickets each minute and delivers approved outbox items through configured connectors.\n\nSelect **Relay API** (HTTP Header Auth) on the HTTP Request node. Set `AUTOMATION_API_URL`, test using **Run manually**, and Publish to enable the schedule.\n\nRetries transport/HTTP failures at most 3 times. The API owns ticket leasing, idempotency, retry timing, approval gates, and the audit log.",
+        "height": 260,
+        "width": 720
+      },
+      "id": "df39f76f-e868-581b-89da-aa8fe11a8b99",
+      "name": "Setup notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -320
+      ]
+    }
+  ],
+  "connections": {
+    "Every minute": {
+      "main": [
+        [
+          {
+            "node": "Process queued work",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run manually": {
+      "main": [
+        [
+          {
+            "node": "Process queued work",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "executionTimeout": 180,
+    "timezone": "UTC"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "description": "Durable support processing and approved outbox delivery. The API holds state; n8n schedules ticks. A Manual Trigger supports operator smoke checks.",
+  "tags": []
+}

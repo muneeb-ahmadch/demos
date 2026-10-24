@@ -1,0 +1,126 @@
+{
+  "name": "Relay | Support intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "relay/support-intake",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fef721ab-8e1d-511b-a2c4-3562d08c60de",
+      "name": "Support intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "fb4c4bf8-033e-5950-9530-894b949ac688"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.AUTOMATION_API_URL || 'http://127.0.0.1:8765').replace(/\\/$/, '') + '/api/intake' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({external_id: $json.body.external_id, name: $json.body.name, email: $json.body.email, subject: $json.body.subject, message: $json.body.message}) }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fcce310d-06be-5791-80dc-b5d173630d01",
+      "name": "Relay API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}"
+        }
+      },
+      "id": "f64a8cf4-0860-5566-ad4a-4bf03e2ef0c9",
+      "name": "Return API result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Relay \u00b7 Support Operations\nAuthenticated support intake. The API persists a ticket before returning 202; external_id is the idempotency key. The API response code and JSON are passed through to the caller.\n\n1. Select **Relay Intake** (Header Auth, `X-Relay-Token`) on the Webhook.\n2. Select **Relay API** (Header Auth, `Authorization: Bearer \u2026`) on the HTTP node.\n3. Set `AUTOMATION_API_URL` on n8n; self-hosted instances must allow env access in nodes.\n4. Test, then **Publish**. See deployment/README.md.\n\nCredential values are intentionally excluded from this export.",
+        "height": 260,
+        "width": 720
+      },
+      "id": "df39f76f-e868-581b-89da-aa8fe11a8b99",
+      "name": "Setup notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -320
+      ]
+    }
+  ],
+  "connections": {
+    "Support intake": {
+      "main": [
+        [
+          {
+            "node": "Relay API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay API": {
+      "main": [
+        [
+          {
+            "node": "Return API result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "executionTimeout": 120,
+    "timezone": "UTC"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "description": "Authenticated support intake. The API persists a ticket before returning 202; external_id is the idempotency key. The API response code and JSON are passed through to the caller.",
+  "tags": []
+}
