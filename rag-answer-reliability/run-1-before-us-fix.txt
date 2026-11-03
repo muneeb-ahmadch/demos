@@ -1,0 +1,17 @@
+ #  question                                               source kind     guard on               guard off
+ 1  Can I return an opened serum?                          PDF             PASS sources           PASS sources
+ 2  How many days do I have to return an unopened product? PDF             PASS sources           PASS sources
+ 3  Does the Vitamin C Serum contain fragrance?            PDF             PASS sources           PASS sources
+ 4  Can I change the address on my order?                  document        PASS sources           PASS sources
+ 5  What is the minimum wholesale order?                   document        PASS sources           PASS sources
+ 6  How long does shipping take in the US?                 website         FAIL not-available     FAIL sources
+ 7  Do you ship to Canada?                                 website         PASS sources           PASS sources
+ 8  Do you offer a student discount?                       not in sources  PASS not-available     FAIL sources
+ 9  Is the serum approved by the FDA?                      not in sources  PASS not-available     FAIL sources
+10  Can I pay with Klarna?                                 not in sources  PASS not-available     FAIL sources
+11  Do you have a shop I can visit in person?              not in sources  PASS not-available     FAIL sources
+12  Do you sell gift cards?                                not in sources  PASS not-available     FAIL sources
+
+guard on: 11/12 pass · guard off: 6/12 pass
+not in the sources: guard on said 'not available' on 5 of 5; guard off answered 5 of 5 anyway
+answers with a named source: 6 of 6 · grounding check passed: 6 of 6
